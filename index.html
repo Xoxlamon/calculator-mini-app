@@ -164,7 +164,39 @@
             <button class="button operator" onclick="calculate()"><span>=</span></button>
         </div>
     </div>
+// Установка PWA
+let deferredPrompt;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallButton();
+});
+
+function showInstallButton() {
+  const installBtn = document.createElement('button');
+  installBtn.className = 'header-button';
+  installBtn.textContent = 'Установить';
+  installBtn.style.background = '#4CAF50';
+  installBtn.onclick = installApp;
+  document.querySelector('.header').appendChild(installBtn);
+}
+
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    deferredPrompt = null;
+  }
+}
+
+// Регистрация сервис-воркера
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js');
+  });
+}
     <script>
         let currentValue = '0';
         let previousValue = null;
