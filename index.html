@@ -2,126 +2,201 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Калькулятор</title>
     <style>
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
-            background-color: #f0f0f0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
-        .calculator {
-            background-color: #000;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #1c1c1e;
         }
-        .display {
-            width: 100%;
-            height: 60px;
-            text-align: right;
-            margin-bottom: 20px;
-            padding: 10px;
-            font-size: 36px;
+
+        .header-button {
+            background: none;
             border: none;
-            border-radius: 10px;
-            background-color: #000;
             color: #fff;
+            font-size: 18px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #2c2c2e;
         }
+
+        .calculator {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .display {
+            color: white;
+            font-size: 48px;
+            text-align: right;
+            padding: 30px 10px;
+            background: #000;
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            flex-grow: 1;
         }
+
         .button {
-            padding: 20px;
-            font-size: 24px;
             border: none;
             border-radius: 50%;
-            background-color: #333;
-            color: #fff;
+            font-size: 28px;
+            background: #333;
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: filter 0.2s;
+            aspect-ratio: 1;
         }
+
         .button:active {
-            background-color: #555;
+            filter: brightness(130%);
         }
-        .button.operator {
-            background-color: #ff9500;
-            color: #fff;
+
+        .operator {
+            background: #ff9f0a;
         }
-        .button.operator:active {
-            background-color: #cc7a00;
+
+        .special {
+            background: #a5a5a5;
+            color: black;
         }
-        .button.zero {
+
+        .zero {
             grid-column: span 2;
-            border-radius: 40px;
-        }
-        .button.clear {
-            background-color: #a5a5a5;
-            color: #000;
-        }
-        .button.clear:active {
-            background-color: #8c8c8c;
+            border-radius: 35px;
+            aspect-ratio: unset;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <button class="header-button">Дом</button>
+        <button class="header-button">Оружие</button>
+    </div>
+    
     <div class="calculator">
-        <input type="text" class="display" id="display" disabled>
+        <input type="text" class="display" id="display" value="0" disabled>
         <div class="buttons">
-            <button class="button clear" onclick="clearDisplay()">AC</button>
-            <button class="button clear" onclick="toggleSign()">+/-</button>
-            <button class="button clear" onclick="appendToDisplay('%')">%</button>
-            <button class="button operator" onclick="appendToDisplay('/')">÷</button>
-            <button class="button" onclick="appendToDisplay('7')">7</button>
-            <button class="button" onclick="appendToDisplay('8')">8</button>
-            <button class="button" onclick="appendToDisplay('9')">9</button>
-            <button class="button operator" onclick="appendToDisplay('*')">×</button>
-            <button class="button" onclick="appendToDisplay('4')">4</button>
-            <button class="button" onclick="appendToDisplay('5')">5</button>
-            <button class="button" onclick="appendToDisplay('6')">6</button>
-            <button class="button operator" onclick="appendToDisplay('-')">−</button>
-            <button class="button" onclick="appendToDisplay('1')">1</button>
-            <button class="button" onclick="appendToDisplay('2')">2</button>
-            <button class="button" onclick="appendToDisplay('3')">3</button>
-            <button class="button operator" onclick="appendToDisplay('+')">+</button>
-            <button class="button zero" onclick="appendToDisplay('0')">0</button>
-            <button class="button" onclick="appendToDisplay('.')">.</button>
+            <button class="button special" onclick="clearDisplay()">AC</button>
+            <button class="button special" onclick="toggleSign()">±</button>
+            <button class="button special" onclick="appendPercentage()">%</button>
+            <button class="button operator" onclick="appendOperator('÷')">÷</button>
+            
+            <button class="button" onclick="appendNumber('7')">7</button>
+            <button class="button" onclick="appendNumber('8')">8</button>
+            <button class="button" onclick="appendNumber('9')">9</button>
+            <button class="button operator" onclick="appendOperator('×')">×</button>
+            
+            <button class="button" onclick="appendNumber('4')">4</button>
+            <button class="button" onclick="appendNumber('5')">5</button>
+            <button class="button" onclick="appendNumber('6')">6</button>
+            <button class="button operator" onclick="appendOperator('−')">−</button>
+            
+            <button class="button" onclick="appendNumber('1')">1</button>
+            <button class="button" onclick="appendNumber('2')">2</button>
+            <button class="button" onclick="appendNumber('3')">3</button>
+            <button class="button operator" onclick="appendOperator('+')">+</button>
+            
+            <button class="button zero" onclick="appendNumber('0')">0</button>
+            <button class="button" onclick="appendNumber('.')">.</button>
             <button class="button operator" onclick="calculate()">=</button>
         </div>
     </div>
 
     <script>
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
+        let currentValue = '0';
+        let previousValue = null;
+        let operation = null;
+        
+        function updateDisplay() {
+            document.getElementById('display').value = currentValue;
+        }
+
+        function appendNumber(num) {
+            if (currentValue === '0' && num !== '.') {
+                currentValue = num;
+            } else {
+                if (num === '.' && currentValue.includes('.')) return;
+                currentValue += num;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            previousValue = currentValue;
+            currentValue = '0';
+            operation = op;
         }
 
         function clearDisplay() {
-            document.getElementById('display').value = '';
+            currentValue = '0';
+            previousValue = null;
+            operation = null;
+            updateDisplay();
         }
 
         function toggleSign() {
-            const display = document.getElementById('display');
-            if (display.value.charAt(0) === '-') {
-                display.value = display.value.slice(1);
-            } else {
-                display.value = '-' + display.value;
-            }
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        function appendPercentage() {
+            currentValue = (parseFloat(currentValue) / 100).toString();
+            updateDisplay();
         }
 
         function calculate() {
-            const display = document.getElementById('display');
-            try {
-                display.value = eval(display.value.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-'));
-            } catch (error) {
-                display.value = 'Ошибка';
+            if (!operation || !previousValue) return;
+            
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+            
+            switch(operation) {
+                case '+':
+                    currentValue = (prev + current).toString();
+                    break;
+                case '−':
+                    currentValue = (prev - current).toString();
+                    break;
+                case '×':
+                    currentValue = (prev * current).toString();
+                    break;
+                case '÷':
+                    currentValue = (prev / current).toString();
+                    break;
             }
+            
+            previousValue = null;
+            operation = null;
+            updateDisplay();
         }
     </script>
 </body>
