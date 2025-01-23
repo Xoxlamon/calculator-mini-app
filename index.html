@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <link rel="manifest" href="manifest.json">
-<!-- Иконка для Apple устройств -->
-<link rel="apple-touch-icon" href="icon-192x192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Калькулятор</title>
@@ -42,6 +39,7 @@
             padding: 8px 20px;
             border-radius: 20px;
             font-size: 16px;
+            cursor: pointer;
         }
 
         .calculator {
@@ -128,15 +126,53 @@
             position: absolute;
             pointer-events: none;
         }
+
+        .ohm-law-calculator {
+            display: none;
+            flex-direction: column;
+            gap: 2vh;
+            padding: 2vh;
+        }
+
+        .ohm-law-calculator input {
+            width: 100%;
+            padding: 2vh;
+            font-size: 2.5vh;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+        }
+
+        .ohm-law-calculator button {
+            padding: 2vh;
+            font-size: 2.5vh;
+            border-radius: 10px;
+            border: none;
+            background: #ff9f0a;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .ohm-law-calculator button:active {
+            background: #cc7a00;
+        }
+
+        .ohm-law-calculator .result {
+            color: #fff;
+            font-size: 3vh;
+            text-align: center;
+            padding: 2vh;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <button class="header-button">проверка</button>
-        <button class="header-button">настройки</button>
+        <button class="header-button" onclick="showCalculator()">Дом</button>
+        <button class="header-button" onclick="showOhmLawCalculator()">Оружие</button>
     </div>
     
-    <div class="calculator">
+    <div class="calculator" id="standardCalculator">
         <input type="text" class="display" id="display" value="0" disabled>
         <div class="buttons">
             <button class="button special" onclick="clearDisplay()"><span>AC</span></button>
@@ -164,39 +200,15 @@
             <button class="button operator" onclick="calculate()"><span>=</span></button>
         </div>
     </div>
-// Установка PWA
-let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  showInstallButton();
-});
+    <div class="calculator ohm-law-calculator" id="ohmLawCalculator">
+        <input type="number" id="voltage" placeholder="Напряжение (V)">
+        <input type="number" id="current" placeholder="Ток (I)">
+        <input type="number" id="resistance" placeholder="Сопротивление (R)">
+        <button onclick="calculateOhmLaw()">Рассчитать</button>
+        <div class="result" id="ohmLawResult"></div>
+    </div>
 
-function showInstallButton() {
-  const installBtn = document.createElement('button');
-  installBtn.className = 'header-button';
-  installBtn.textContent = 'Установить';
-  installBtn.style.background = '#4CAF50';
-  installBtn.onclick = installApp;
-  document.querySelector('.header').appendChild(installBtn);
-}
-
-async function installApp() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    deferredPrompt = null;
-  }
-}
-
-// Регистрация сервис-воркера
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js');
-  });
-}
     <script>
         let currentValue = '0';
         let previousValue = null;
@@ -263,6 +275,35 @@ if ('serviceWorker' in navigator) {
             previousValue = null;
             operation = null;
             updateDisplay();
+        }
+
+        function showCalculator() {
+            document.getElementById('standardCalculator').style.display = 'flex';
+            document.getElementById('ohmLawCalculator').style.display = 'none';
+        }
+
+        function showOhmLawCalculator() {
+            document.getElementById('standardCalculator').style.display = 'none';
+            document.getElementById('ohmLawCalculator').style.display = 'flex';
+        }
+
+        function calculateOhmLaw() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            const resistance = parseFloat(document.getElementById('resistance').value);
+
+            let result = '';
+            if (!isNaN(voltage) && !isNaN(current)) {
+                result = `R = ${(voltage / current).toFixed(2)} Ω`;
+            } else if (!isNaN(voltage) && !isNaN(resistance)) {
+                result = `I = ${(voltage / resistance).toFixed(2)} A`;
+            } else if (!isNaN(current) && !isNaN(resistance)) {
+                result = `V = ${(current * resistance).toFixed(2)} V`;
+            } else {
+                result = 'Введите два значения';
+            }
+
+            document.getElementById('ohmLawResult').innerText = result;
         }
     </script>
 </body>
