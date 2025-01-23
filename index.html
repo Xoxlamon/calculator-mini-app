@@ -78,7 +78,7 @@
         .button {
             border: none;
             border-radius: 50%;
-            font-size: 3.2vh;
+            font-size: 2.5vh; /* Уменьшенный размер шрифта */
             background: #333;
             color: white;
             cursor: pointer;
@@ -89,6 +89,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            width: 8vh; /* Фиксированная ширина кнопок */
+            height: 8vh; /* Фиксированная высота кнопок */
         }
 
         .button::after {
@@ -116,6 +118,8 @@
             aspect-ratio: unset;
             justify-content: flex-start;
             padding-left: 4vh;
+            width: 18vh; /* Уменьшенная ширина для кнопки "0" */
+            height: 8vh; /* Уменьшенная высота для кнопки "0" */
         }
 
         .zero::after {
