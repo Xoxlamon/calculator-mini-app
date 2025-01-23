@@ -32,6 +32,15 @@
             z-index: 10;
         }
 
+        .header-button {
+            background: #2c2c2e;
+            border: none;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
         .calculator {
             position: fixed;
             top: 60px;
@@ -78,6 +87,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .button::after {
@@ -110,6 +120,11 @@
         .zero::after {
             display: none;
         }
+
+        .button span {
+            position: absolute;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -121,12 +136,99 @@
     <div class="calculator">
         <input type="text" class="display" id="display" value="0" disabled>
         <div class="buttons">
-            <!-- Кнопки остаются такими же как в предыдущей версии -->
+            <button class="button special" onclick="clearDisplay()"><span>AC</span></button>
+            <button class="button special" onclick="toggleSign()"><span>±</span></button>
+            <button class="button special" onclick="appendPercentage()"><span>%</span></button>
+            <button class="button operator" onclick="appendOperator('÷')"><span>÷</span></button>
+            
+            <button class="button" onclick="appendNumber('7')"><span>7</span></button>
+            <button class="button" onclick="appendNumber('8')"><span>8</span></button>
+            <button class="button" onclick="appendNumber('9')"><span>9</span></button>
+            <button class="button operator" onclick="appendOperator('×')"><span>×</span></button>
+            
+            <button class="button" onclick="appendNumber('4')"><span>4</span></button>
+            <button class="button" onclick="appendNumber('5')"><span>5</span></button>
+            <button class="button" onclick="appendNumber('6')"><span>6</span></button>
+            <button class="button operator" onclick="appendOperator('−')"><span>−</span></button>
+            
+            <button class="button" onclick="appendNumber('1')"><span>1</span></button>
+            <button class="button" onclick="appendNumber('2')"><span>2</span></button>
+            <button class="button" onclick="appendNumber('3')"><span>3</span></button>
+            <button class="button operator" onclick="appendOperator('+')"><span>+</span></button>
+            
+            <button class="button zero" onclick="appendNumber('0')"><span>0</span></button>
+            <button class="button" onclick="appendNumber('.')"><span>.</span></button>
+            <button class="button operator" onclick="calculate()"><span>=</span></button>
         </div>
     </div>
 
     <script>
-        // JavaScript остается без изменений из предыдущей версии
+        let currentValue = '0';
+        let previousValue = null;
+        let operation = null;
+        
+        function updateDisplay() {
+            document.getElementById('display').value = currentValue;
+        }
+
+        function appendNumber(num) {
+            if (currentValue === '0' && num !== '.') {
+                currentValue = num;
+            } else {
+                if (num === '.' && currentValue.includes('.')) return;
+                currentValue += num;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            previousValue = currentValue;
+            currentValue = '0';
+            operation = op;
+        }
+
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = null;
+            operation = null;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        function appendPercentage() {
+            currentValue = (parseFloat(currentValue) / 100).toString();
+            updateDisplay();
+        }
+
+        function calculate() {
+            if (!operation || !previousValue) return;
+            
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+            
+            switch(operation) {
+                case '+':
+                    currentValue = (prev + current).toString();
+                    break;
+                case '−':
+                    currentValue = (prev - current).toString();
+                    break;
+                case '×':
+                    currentValue = (prev * current).toString();
+                    break;
+                case '÷':
+                    currentValue = (prev / current).toString();
+                    break;
+            }
+            
+            previousValue = null;
+            operation = null;
+            updateDisplay();
+        }
     </script>
 </body>
 </html>
