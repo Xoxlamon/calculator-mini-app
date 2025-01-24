@@ -5,94 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Калькулятор</title>
     <style>
+        /* Общие стили для всех элементов */
         * {
-            box-sizing: border-box;
-            touch-action: manipulation;
+            box-sizing: border-box; /* Учитываем padding и border в размерах элементов */
+            touch-action: manipulation; /* Оптимизация для сенсорных устройств */
             margin: 0;
             padding: 0;
         }
         
+        /* Стили для body */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #001f3f;
-            height: 100vh;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Шрифт */
+            background: #001f3f; /* Темно-синий фон */
+            height: 100vh; /* Высота на весь экран */
+            overflow: hidden; /* Скрываем скролл */
             position: relative;
         }
 
+        /* Стили для шапки */
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Распределение кнопок по ширине */
             padding: 12px 15px;
-            background: #1c1c1e;
-            position: fixed;
+            background: #1c1c1e; /* Темный фон шапки */
+            position: fixed; /* Фиксированная позиция */
             top: 0;
             left: 0;
             right: 0;
-            z-index: 10;
+            z-index: 10; /* Поверх других элементов */
         }
 
+        /* Стили для кнопок в шапке */
         .header-button {
-            background: #2c2c2e;
+            background: #2c2c2e; /* Темный фон кнопок */
             border: none;
-            color: #fff;
+            color: #fff; /* Белый текст */
             padding: 6px 18px;
-            border-radius: 16px;
+            border-radius: 16px; /* Закругленные углы */
             font-size: 12px;
             cursor: pointer;
         }
 
+        /* Стили для новых кнопок в шапке */
         .header-button.new-button {
-            background: #4CAF50;
-            margin-left: 6px;
+            background: #4CAF50; /* Зеленый цвет для новых кнопок */
+            margin-left: 6px; /* Отступ между кнопками */
         }
 
+        /* Стили для основного калькулятора */
         .calculator {
             position: fixed;
-            top: 60px;
+            top: 60px; /* Отступ от шапки */
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 0.5vh;
+            padding: 0.5vh; /* Уменьшено расстояние от кнопок до экрана */
             display: flex;
             flex-direction: column;
             max-width: 100%;
             margin: 0 auto;
         }
 
+        /* Стили для экрана калькулятора */
         .display {
-            color: white;
-            font-size: 7.5vh;
-            text-align: right;
+            color: white; /* Белый текст */
+            font-size: 7.5vh; /* Крупный шрифт */
+            text-align: right; /* Выравнивание текста по правому краю */
             padding: 3vh 10px;
-            background: #000;
+            background: #000; /* Черный фон */
             border: none;
             width: 100%;
             flex-shrink: 0;
         }
 
+        /* Стили для кнопок калькулятора */
         .buttons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.5vh;
+            grid-template-columns: repeat(4, 1fr); /* 4 колонки */
+            gap: 0.5vh; /* Расстояние между кнопками */
             flex-grow: 1;
             max-height: 75vh;
-            padding: 0.5vh;
-            margin-top: 1vh;
+            padding: 0.5vh; /* Равномерное расстояние от стенок */
+            margin-top: 1vh; /* Отступ сверху от черного экрана */
         }
 
-        .engineering-calculator .buttons {
-            grid-template-columns: repeat(5, 1fr); /* 5 колонок для инженерного калькулятора */
-        }
-
+        /* Стили для каждой кнопки */
         .button {
             border: none;
-            border-radius: 50%;
+            border-radius: 50%; /* Круглые кнопки */
             font-size: 3.5vh;
-            background: #333;
-            color: white;
+            background: #333; /* Темный фон кнопок */
+            color: white; /* Белый текст */
             cursor: pointer;
-            transition: filter 0.2s, background-color 0.2s;
+            transition: filter 0.2s, background-color 0.2s; /* Плавные переходы */
             min-width: 0;
             min-height: 0;
             display: flex;
@@ -101,105 +106,120 @@
             position: relative;
             width: 10vh;
             height: 10vh;
-            margin: 0.5vh;
+            margin: 0.5vh; /* Равномерное расстояние от стенок */
         }
 
+        /* Псевдоэлемент для круглых кнопок */
         .button::after {
             content: '';
             display: block;
             padding-bottom: 100%;
         }
 
+        /* Эффект при нажатии на кнопку */
         .button:active {
-            filter: brightness(130%);
+            filter: brightness(130%); /* Увеличение яркости */
         }
 
+        /* Стили для операторов (+, -, ×, ÷) */
         .operator {
-            background: #ff9f0a;
+            background: #ff9f0a; /* Оранжевый фон */
         }
 
+        /* Стили для специальных кнопок (AC, ±, %) */
         .special {
-            background: #a5a5a5;
-            color: black;
+            background: #a5a5a5; /* Серый фон */
+            color: black; /* Черный текст */
         }
 
+        /* Стили для кнопки "0" */
         .zero {
-            grid-column: span 1;
-            border-radius: 50%;
+            grid-column: span 1; /* Теперь занимает одну колонку */
+            border-radius: 50%; /* Круглая кнопка */
             aspect-ratio: 1;
             justify-content: center;
             padding-left: 0;
             width: 10vh;
             height: 10vh;
-            margin: 0.5vh;
+            margin: 0.5vh; /* Равномерное расстояние от стенок */
         }
 
+        /* Убираем псевдоэлемент для кнопки "0" */
         .zero::after {
             display: none;
         }
 
+        /* Стили для текста внутри кнопок */
         .button span {
             position: absolute;
             pointer-events: none;
         }
 
+        /* Стили для калькулятора закона Ома */
         .ohm-law-calculator {
-            display: none;
+            display: none; /* Скрыт по умолчанию */
             flex-direction: column;
-            gap: 2vh;
+            gap: 2vh; /* Расстояние между элементами */
             padding: 2vh;
         }
 
+        /* Стили для полей ввода */
         .ohm-law-calculator input {
             width: 100%;
             padding: 2vh;
             font-size: 2.5vh;
-            border-radius: 10px;
-            border: 1px solid #444;
-            background: #222;
-            color: #fff;
+            border-radius: 10px; /* Закругленные углы */
+            border: 1px solid #444; /* Темная рамка */
+            background: #222; /* Темный фон */
+            color: #fff; /* Белый текст */
         }
 
+        /* Стили для кнопок в калькуляторе закона Ома */
         .ohm-law-calculator button {
             padding: 2vh;
             font-size: 2.5vh;
             border-radius: 10px;
             border: none;
-            background: #ff9f0a;
-            color: #fff;
+            background: #ff9f0a; /* Оранжевый фон */
+            color: #fff; /* Белый текст */
             cursor: pointer;
         }
 
+        /* Эффект при нажатии на кнопку */
         .ohm-law-calculator button:active {
-            background: #cc7a00;
+            background: #cc7a00; /* Темно-оранжевый фон */
         }
 
+        /* Стили для блока с результатом */
         .ohm-law-calculator .result {
-            color: #000;
+            color: #000; /* Черный текст */
             font-size: 3vh;
             text-align: center;
             padding: 2vh;
-            background: #f0f0f0;
+            background: #f0f0f0; /* Светлый фон */
             border-radius: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Серая рамка */
         }
 
+        /* Стили для группы ввода */
         .ohm-law-calculator .input-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 10px; /* Расстояние между элементами */
             margin-bottom: 2vh;
         }
 
+        /* Стили для меток ввода */
         .ohm-law-calculator .input-label {
             font-size: 2.5vh;
-            color: #fff;
-            width: 20px;
+            color: #fff; /* Белый текст */
+            width: 20px; /* Фиксированная ширина для выравнивания */
             text-align: center;
         }
     </style>
 </head>
 <body>
+    <!-- Шапка с кнопками -->
     <div class="header">
         <button class="header-button" onclick="showCalculator()">домой</button>
         <button class="header-button new-button" onclick="calculatePower()">Button 1</button>
@@ -207,9 +227,11 @@
         <button class="header-button" onclick="showOhmLawCalculator()">Закон Ома</button>
     </div>
     
-    <!-- Стандартный калькулятор -->
+    <!-- Основной калькулятор -->
     <div class="calculator" id="standardCalculator">
+        <!-- Экран калькулятора -->
         <input type="text" class="display" id="display" value="0" readonly>
+        <!-- Кнопки калькулятора -->
         <div class="buttons">
             <button class="button special" onclick="clearDisplay()"><span>AC</span></button>
             <button class="button special" onclick="toggleSign()"><span>±</span></button>
@@ -238,50 +260,9 @@
         </div>
     </div>
 
-    <!-- Инженерный калькулятор -->
-    <div class="calculator engineering-calculator" id="engineeringCalculator" style="display: none;">
-        <input type="text" class="display" id="engineeringDisplay" value="0" readonly>
-        <div class="buttons">
-            <button class="button special" onclick="clearEngineeringDisplay()"><span>AC</span></button>
-            <button class="button special" onclick="toggleEngineeringSign()"><span>±</span></button>
-            <button class="button special" onclick="appendEngineeringPercentage()"><span>%</span></button>
-            <button class="button operator" onclick="appendEngineeringOperator('÷')"><span>÷</span></button>
-            
-            <button class="button" onclick="appendEngineeringNumber('7')"><span>7</span></button>
-            <button class="button" onclick="appendEngineeringNumber('8')"><span>8</span></button>
-            <button class="button" onclick="appendEngineeringNumber('9')"><span>9</span></button>
-            <button class="button operator" onclick="appendEngineeringOperator('×')"><span>×</span></button>
-            
-            <button class="button" onclick="appendEngineeringNumber('4')"><span>4</span></button>
-            <button class="button" onclick="appendEngineeringNumber('5')"><span>5</span></button>
-            <button class="button" onclick="appendEngineeringNumber('6')"><span>6</span></button>
-            <button class="button operator" onclick="appendEngineeringOperator('−')"><span>−</span></button>
-            
-            <button class="button" onclick="appendEngineeringNumber('1')"><span>1</span></button>
-            <button class="button" onclick="appendEngineeringNumber('2')"><span>2</span></button>
-            <button class="button" onclick="appendEngineeringNumber('3')"><span>3</span></button>
-            <button class="button operator" onclick="appendEngineeringOperator('+')"><span>+</span></button>
-            
-            <button class="button zero" onclick="appendEngineeringNumber('0')"><span>0</span></button>
-            <button class="button" onclick="appendEngineeringNumber('00')"><span>00</span></button>
-            <button class="button" onclick="appendEngineeringNumber('.')"><span>.</span></button>
-            <button class="button operator" onclick="calculateEngineering()"><span>=</span></button>
-
-            <!-- Дополнительные кнопки для инженерного калькулятора -->
-            <button class="button" onclick="appendEngineeringFunction('sin')"><span>sin</span></button>
-            <button class="button" onclick="appendEngineeringFunction('cos')"><span>cos</span></button>
-            <button class="button" onclick="appendEngineeringFunction('tan')"><span>tan</span></button>
-            <button class="button" onclick="appendEngineeringFunction('sqrt')"><span>√</span></button>
-            <button class="button" onclick="appendEngineeringFunction('log')"><span>log</span></button>
-            <button class="button" onclick="appendEngineeringFunction('ln')"><span>ln</span></button>
-            <button class="button" onclick="appendEngineeringFunction('pow')"><span>x^y</span></button>
-            <button class="button" onclick="appendEngineeringFunction('pi')"><span>π</span></button>
-            <button class="button" onclick="appendEngineeringFunction('exp')"><span>e^x</span></button>
-        </div>
-    </div>
-
     <!-- Калькулятор закона Ома -->
     <div class="calculator ohm-law-calculator" id="ohmLawCalculator">
+        <!-- Поля ввода для закона Ома -->
         <div class="input-group">
             <span class="input-label">U</span>
             <input type="number" id="voltage" placeholder="Напряжение (V)">
@@ -298,22 +279,27 @@
             <span class="input-label">P</span>
             <input type="number" id="power" placeholder="Мощность (P)">
         </div>
+        <!-- Кнопки для расчета и сброса -->
         <div style="display: flex; gap: 10px;">
             <button onclick="calculateOhmLaw()">Рассчитать</button>
             <button onclick="resetOhmLawCalculator()">Сброс</button>
         </div>
+        <!-- Блок для вывода результата -->
         <div class="result" id="ohmLawResult"></div>
     </div>
 
     <script>
+        // Переменные для хранения текущего значения, предыдущего значения и операции
         let currentValue = '0';
         let previousValue = null;
         let operation = null;
         
+        // Функция для обновления экрана калькулятора
         function updateDisplay() {
             document.getElementById('display').value = currentValue;
         }
 
+        // Функция для добавления цифры на экран
         function appendNumber(num) {
             if (currentValue === '0' && num !== '.') {
                 currentValue = num;
@@ -324,12 +310,14 @@
             updateDisplay();
         }
 
+        // Функция для добавления оператора
         function appendOperator(op) {
             previousValue = currentValue;
             currentValue = '0';
             operation = op;
         }
 
+        // Функция для очистки экрана
         function clearDisplay() {
             currentValue = '0';
             previousValue = null;
@@ -337,16 +325,19 @@
             updateDisplay();
         }
 
+        // Функция для изменения знака числа
         function toggleSign() {
             currentValue = (parseFloat(currentValue) * -1).toString();
             updateDisplay();
         }
 
+        // Функция для добавления процента
         function appendPercentage() {
             currentValue = (parseFloat(currentValue) / 100).toString();
             updateDisplay();
         }
 
+        // Функция для выполнения расчета
         function calculate() {
             if (!operation || !previousValue) return;
             
@@ -373,18 +364,19 @@
             updateDisplay();
         }
 
+        // Функция для показа основного калькулятора
         function showCalculator() {
             document.getElementById('standardCalculator').style.display = 'flex';
-            document.getElementById('engineeringCalculator').style.display = 'none';
             document.getElementById('ohmLawCalculator').style.display = 'none';
         }
 
+        // Функция для показа калькулятора закона Ома
         function showOhmLawCalculator() {
             document.getElementById('standardCalculator').style.display = 'none';
-            document.getElementById('engineeringCalculator').style.display = 'none';
             document.getElementById('ohmLawCalculator').style.display = 'flex';
         }
 
+        // Функция для расчета закона Ома
         function calculateOhmLaw() {
             const voltage = parseFloat(document.getElementById('voltage').value);
             const current = parseFloat(document.getElementById('current').value);
@@ -394,20 +386,26 @@
             let result = '';
 
             if (!isNaN(voltage) && !isNaN(current)) {
+                // Если известны напряжение и ток
                 result = `R = ${(voltage / current).toFixed(2)} Ω, P = ${(voltage * current).toFixed(2)} W`;
             } else if (!isNaN(voltage) && !isNaN(resistance)) {
+                // Если известны напряжение и сопротивление
                 const calculatedCurrent = voltage / resistance;
                 result = `I = ${calculatedCurrent.toFixed(2)} A, P = ${(voltage * calculatedCurrent).toFixed(2)} W`;
             } else if (!isNaN(current) && !isNaN(resistance)) {
+                // Если известны ток и сопротивление
                 const calculatedVoltage = current * resistance;
                 result = `V = ${calculatedVoltage.toFixed(2)} V, P = ${(current * current * resistance).toFixed(2)} W`;
             } else if (!isNaN(voltage) && !isNaN(power)) {
+                // Если известны напряжение и мощность
                 const calculatedCurrent = power / voltage;
                 result = `I = ${calculatedCurrent.toFixed(2)} A, R = ${(voltage / calculatedCurrent).toFixed(2)} Ω`;
             } else if (!isNaN(current) && !isNaN(power)) {
+                // Если известны ток и мощность
                 const calculatedVoltage = power / current;
                 result = `V = ${calculatedVoltage.toFixed(2)} V, R = ${(calculatedVoltage / current).toFixed(2)} Ω`;
             } else if (!isNaN(resistance) && !isNaN(power)) {
+                // Если известны сопротивление и мощность
                 const calculatedCurrent = Math.sqrt(power / resistance);
                 result = `I = ${calculatedCurrent.toFixed(2)} A, V = ${(calculatedCurrent * resistance).toFixed(2)} V`;
             } else {
@@ -417,6 +415,7 @@
             document.getElementById('ohmLawResult').textContent = result;
         }
 
+        // Функция для сброса калькулятора закона Ома
         function resetOhmLawCalculator() {
             document.getElementById('voltage').value = '';
             document.getElementById('current').value = '';
@@ -425,138 +424,26 @@
             document.getElementById('ohmLawResult').textContent = '';
         }
 
+        // Функция для расчета мощности (пример)
         function calculatePower() {
-            const voltage = 12;
-            const current = 2;
-            const power = voltage * current;
-            alert(`Мощность: ${power} W`);
+            const voltage = 12; // Пример значения напряжения
+            const current = 2;  // Пример значения тока
+            const power = voltage * current; // Расчет мощности
+
+            const result = `Мощность: ${power} W`;
+            alert(result); // Вывод результата в alert
         }
 
+        // Функция для расчета из изображения (пример)
         function calculateFromImage() {
-            const voltage = 12;
-            const current = 2;
-            const resistance = 6;
-            const power = voltage * current;
-            alert(`Напряжение: ${voltage} V, Ток: ${current} A, Сопротивление: ${resistance} Ω, Мощность: ${power} W`);
+            const voltage = 12; // Пример значения напряжения
+            const current = 2;  // Пример значения тока
+            const resistance = 6; // Пример значения сопротивления
+            const power = voltage * current; // Расчет мощности
+
+            const result = `Напряжение: ${voltage} V, Ток: ${current} A, Сопротивление: ${resistance} Ω, Мощность: ${power} W`;
+            alert(result); // Вывод результата в alert
         }
-
-        // Инженерный калькулятор
-        let engineeringCurrentValue = '0';
-        let engineeringPreviousValue = null;
-        let engineeringOperation = null;
-
-        function updateEngineeringDisplay() {
-            document.getElementById('engineeringDisplay').value = engineeringCurrentValue;
-        }
-
-        function appendEngineeringNumber(num) {
-            if (engineeringCurrentValue === '0' && num !== '.') {
-                engineeringCurrentValue = num;
-            } else {
-                if (num === '.' && engineeringCurrentValue.includes('.')) return;
-                engineeringCurrentValue += num;
-            }
-            updateEngineeringDisplay();
-        }
-
-        function appendEngineeringOperator(op) {
-            engineeringPreviousValue = engineeringCurrentValue;
-            engineeringCurrentValue = '0';
-            engineeringOperation = op;
-        }
-
-        function clearEngineeringDisplay() {
-            engineeringCurrentValue = '0';
-            engineeringPreviousValue = null;
-            engineeringOperation = null;
-            updateEngineeringDisplay();
-        }
-
-        function toggleEngineeringSign() {
-            engineeringCurrentValue = (parseFloat(engineeringCurrentValue) * -1).toString();
-            updateEngineeringDisplay();
-        }
-
-        function appendEngineeringPercentage() {
-            engineeringCurrentValue = (parseFloat(engineeringCurrentValue) / 100).toString();
-            updateEngineeringDisplay();
-        }
-
-        function calculateEngineering() {
-            if (!engineeringOperation || !engineeringPreviousValue) return;
-            
-            const prev = parseFloat(engineeringPreviousValue);
-            const current = parseFloat(engineeringCurrentValue);
-            
-            switch(engineeringOperation) {
-                case '+':
-                    engineeringCurrentValue = (prev + current).toString();
-                    break;
-                case '−':
-                    engineeringCurrentValue = (prev - current).toString();
-                    break;
-                case '×':
-                    engineeringCurrentValue = (prev * current).toString();
-                    break;
-                case '÷':
-                    engineeringCurrentValue = (prev / current).toString();
-                    break;
-            }
-            
-            engineeringPreviousValue = null;
-            engineeringOperation = null;
-            updateEngineeringDisplay();
-        }
-
-        function appendEngineeringFunction(func) {
-            const current = parseFloat(engineeringCurrentValue);
-            switch(func) {
-                case 'sin':
-                    engineeringCurrentValue = Math.sin(current).toString();
-                    break;
-                case 'cos':
-                    engineeringCurrentValue = Math.cos(current).toString();
-                    break;
-                case 'tan':
-                    engineeringCurrentValue = Math.tan(current).toString();
-                    break;
-                case 'sqrt':
-                    engineeringCurrentValue = Math.sqrt(current).toString();
-                    break;
-                case 'log':
-                    engineeringCurrentValue = Math.log10(current).toString();
-                    break;
-                case 'ln':
-                    engineeringCurrentValue = Math.log(current).toString();
-                    break;
-                case 'pow':
-                    engineeringCurrentValue = Math.pow(prev, current).toString();
-                    break;
-                case 'pi':
-                    engineeringCurrentValue = Math.PI.toString();
-                    break;
-                case 'exp':
-                    engineeringCurrentValue = Math.exp(current).toString();
-                    break;
-            }
-            updateEngineeringDisplay();
-        }
-
-        // Переключение калькуляторов при повороте экрана
-        function toggleCalculator() {
-            const standardCalculator = document.getElementById('standardCalculator');
-            const engineeringCalculator = document.getElementById('engineeringCalculator');
-            
-            if (window.orientation === 90 || window.orientation === -90) {
-                standardCalculator.style.display = 'none';
-                engineeringCalculator.style.display = 'flex';
-            } else {
-                standardCalculator.style.display = 'flex';
-                engineeringCalculator.style.display = 'none';
-            }
-        }
-
-        window.addEventListener('orientationchange', toggleCalculator);
     </script>
 </body>
 </html>
