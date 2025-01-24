@@ -122,6 +122,23 @@
             height: 8vh;
         }
 
+        .double-zero {
+            border-radius: 50%;
+            font-size: 3.5vh;
+            background: #333;
+            color: white;
+            cursor: pointer;
+            transition: filter 0.2s, background-color 0.2s;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 10vh;
+            height: 10vh;
+        }
+
         .zero::after {
             display: none;
         }
@@ -203,6 +220,7 @@
             <button class="button operator" onclick="appendOperator('+')"><span>+</span></button>
             
             <button class="button zero" onclick="appendNumber('0')"><span>0</span></button>
+            <button class="button double-zero" onclick="appendNumber('00')"><span>00</span></button>
             <button class="button" onclick="appendNumber('.')"><span>.</span></button>
             <button class="button operator" onclick="calculate()"><span>=</span></button>
         </div>
