@@ -184,8 +184,8 @@
 <body>
     <div class="header">
         <button class="header-button" onclick="showCalculator()">домой</button>
-        <button class="header-button new-button" onclick="alert('Button 1 clicked')">Button 1</button>
-        <button class="header-button new-button" onclick="alert('Button 2 clicked')">Button 2</button>
+        <button class="header-button new-button" onclick="calculatePower()">Button 1</button>
+        <button class="header-button new-button" onclick="calculateFromImage()">Button 2</button>
         <button class="header-button" onclick="showOhmLawCalculator()">Закон Ома</button>
     </div>
     
@@ -342,6 +342,25 @@
             }
 
             document.getElementById('ohmLawResult').textContent = result;
+        }
+
+        function calculatePower() {
+            const voltage = 12; // Пример значения напряжения
+            const current = 2;  // Пример значения тока
+            const power = voltage * current; // Расчет мощности
+
+            const result = `Мощность: ${power} W`;
+            alert(result); // Вывод результата в alert
+        }
+
+        function calculateFromImage() {
+            const voltage = 12; // Пример значения напряжения
+            const current = 2;  // Пример значения тока
+            const resistance = 6; // Пример значения сопротивления
+            const power = voltage * current; // Расчет мощности
+
+            const result = `Напряжение: ${voltage} V, Ток: ${current} A, Сопротивление: ${resistance} Ω, Мощность: ${power} W`;
+            alert(result); // Вывод результата в alert
         }
     </script>
 </body>
