@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Калькулятор закона Ома</title>
     <style>
+        /* Стили для шапки */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #1c1c1e;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        /* Стили для кнопок в шапке */
+        .header-button {
+            background: #082667;
+            border: none;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
         /* Стили для калькулятора закона Ома */
         .ohm-law-calculator {
             display: flex;
@@ -13,6 +37,7 @@
             padding: 2vh;
             background: #2F3A4C;
             height: 100vh;
+            padding-top: 60px; /* Отступ для шапки */
         }
 
         .ohm-law-calculator input {
@@ -65,6 +90,12 @@
     </style>
 </head>
 <body>
+    <!-- Шапка с кнопкой "Вернуться назад" -->
+    <div class="header">
+        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
+    </div>
+
+    <!-- Калькулятор закона Ома -->
     <div class="ohm-law-calculator">
         <div class="input-group">
             <span class="input-label">U</span>
