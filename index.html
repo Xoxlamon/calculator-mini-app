@@ -7,59 +7,59 @@
     <style>
         /* Общие стили для всех элементов */
         * {
-            box-sizing: border-box; /* Учитываем padding и border в размерах элементов */
-            touch-action: manipulation; /* Оптимизация для сенсорных устройств */
+            box-sizing: border-box;
+            touch-action: manipulation;
             margin: 0;
             padding: 0;
         }
         
         /* Стили для body */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Шрифт */
-            background: #2F3A4C; /* темно-синий с оттенком серого фон. */
-            height: 100vh; /* Высота на весь экран */
-            overflow: hidden; /* Скрываем скролл */
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #2F3A4C;
+            height: 100vh;
+            overflow: hidden;
             position: relative;
         }
 
         /* Стили для шапки */
         .header {
             display: flex;
-            justify-content: space-between; /* Распределение кнопок по ширине */
+            justify-content: space-between;
             padding: 12px 15px;
-            background: #1c1c1e; /* Темный фон шапки */
-            position: fixed; /* Фиксированная позиция */
+            background: #1c1c1e;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 10; /* Поверх других элементов */
+            z-index: 10;
         }
 
         /* Стили для кнопок в шапке */
         .header-button {
-            background: #082667; /* сапфировый фон кнопок сверху (дом, закон Ома) */
+            background: #082667;
             border: none;
-            color: #fff; /* Белый текст */
+            color: #fff;
             padding: 6px 18px;
-            border-radius: 16px; /* Закругленные углы */
+            border-radius: 16px;
             font-size: 12px;
             cursor: pointer;
         }
 
         /* Стили для новых кнопок в шапке */
         .header-button.new-button {
-            background: #4CAF50; /* Зеленый цвет для новых кнопок */
-            margin-left: 6px; /* Отступ между кнопками */
+            background: #4CAF50;
+            margin-left: 6px;
         }
 
         /* Стили для основного калькулятора */
         .calculator {
             position: fixed;
-            top: 60px; /* Отступ от шапки */
+            top: 60px;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 0.5vh; /* Уменьшено расстояние от кнопок до экрана */
+            padding: 0.5vh;
             display: flex;
             flex-direction: column;
             max-width: 100%;
@@ -68,11 +68,11 @@
 
         /* Стили для экрана калькулятора */
         .display {
-            color: white; /* Белый текст */
-            font-size: 7.5vh; /* Крупный шрифт */
-            text-align: right; /* Выравнивание текста по правому краю */
+            color: white;
+            font-size: 7.5vh;
+            text-align: right;
             padding: 3vh 10px;
-            background: #000; /* Черный фон */
+            background: #000;
             border: none;
             width: 100%;
             flex-shrink: 0;
@@ -81,23 +81,23 @@
         /* Стили для кнопок калькулятора */
         .buttons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 колонки */
-            gap: 0.5vh; /* Расстояние между кнопками */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5vh;
             flex-grow: 1;
             max-height: 75vh;
-            padding: 0.5vh; /* Равномерное расстояние от стенок */
-            margin-top: 1vh; /* Отступ сверху от черного экрана */
+            padding: 0.5vh;
+            margin-top: 1vh;
         }
 
         /* Стили для каждой кнопки */
         .button {
             border: none;
-            border-radius: 50%; /* Круглые кнопки */
+            border-radius: 50%;
             font-size: 3.5vh;
-            background: #082567; /* сапфировый фон кнопок */
-            color: white; /* Белый текст */
+            background: #082567;
+            color: white;
             cursor: pointer;
-            transition: filter 0.2s, background-color 0.2s; /* Плавные переходы */
+            transition: filter 0.2s, background-color 0.2s;
             min-width: 0;
             min-height: 0;
             display: flex;
@@ -106,7 +106,7 @@
             position: relative;
             width: 10vh;
             height: 10vh;
-            margin: 0.5vh; /* Равномерное расстояние от стенок */
+            margin: 0.5vh;
         }
 
         /* Псевдоэлемент для круглых кнопок */
@@ -118,30 +118,30 @@
 
         /* Эффект при нажатии на кнопку */
         .button:active {
-            filter: brightness(130%); /* Увеличение яркости */
+            filter: brightness(130%);
         }
 
         /* Стили для операторов (+, -, ×, ÷) */
         .operator {
-            background: #ff9f0a; /* Оранжевый фон */
+            background: #ff9f0a;
         }
 
         /* Стили для специальных кнопок (AC, ±, %) */
         .special {
-            background: #a5a5a5; /* Серый фон */
-            color: black; /* Черный текст */
+            background: #a5a5a5;
+            color: black;
         }
 
         /* Стили для кнопки "0" */
         .zero {
-            grid-column: span 1; /* Теперь занимает одну колонку */
-            border-radius: 50%; /* Круглая кнопка */
+            grid-column: span 1;
+            border-radius: 50%;
             aspect-ratio: 1;
             justify-content: center;
             padding-left: 0;
-            width: 11vh;
-            height: 11vh;
-            margin: 0.5vh; /* Равномерное расстояние от стенок */
+            width: 10vh;
+            height: 10vh;
+            margin: 0.5vh;
         }
 
         /* Убираем псевдоэлемент для кнопки "0" */
@@ -154,68 +154,6 @@
             position: absolute;
             pointer-events: none;
         }
-
-        /* Стили для калькулятора закона Ома */
-        .ohm-law-calculator {
-            display: none; /* Скрыт по умолчанию */
-            flex-direction: column;
-            gap: 2vh; /* Расстояние между элементами */
-            padding: 2vh;
-        }
-
-        /* Стили для полей ввода */
-        .ohm-law-calculator input {
-            width: 100%;
-            padding: 2vh;
-            font-size: 2.5vh;
-            border-radius: 10px; /* Закругленные углы */
-            border: 1px solid #444; /* Темная рамка */
-            background: #222; /* Темный фон */
-            color: #fff; /* Белый текст */
-        }
-
-        /* Стили для кнопок в калькуляторе закона Ома */
-        .ohm-law-calculator button {
-            padding: 2vh;
-            font-size: 2.5vh;
-            border-radius: 10px;
-            border: none;
-            background: #ff9f0a; /* Оранжевый фон */
-            color: #fff; /* Белый текст */
-            cursor: pointer;
-        }
-
-        /* Эффект при нажатии на кнопку */
-        .ohm-law-calculator button:active {
-            background: #cc7a00; /* Темно-оранжевый фон */
-        }
-
-        /* Стили для блока с результатом */
-        .ohm-law-calculator .result {
-            color: #000; /* Черный текст */
-            font-size: 3vh;
-            text-align: center;
-            padding: 2vh;
-            background: #f0f0f0; /* Светлый фон */
-            border-radius: 10px;
-            border: 1px solid #ccc; /* Серая рамка */
-        }
-
-        /* Стили для группы ввода */
-        .ohm-law-calculator .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Расстояние между элементами */
-            margin-bottom: 2vh;
-        }
-
-        /* Стили для меток ввода */
-        .ohm-law-calculator .input-label {
-            font-size: 2.5vh;
-            color: #fff; /* Белый текст */
-            width: 20px; /* Фиксированная ширина для выравнивания */
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -224,7 +162,7 @@
         <button class="header-button" onclick="showCalculator()">домой</button>
         <button class="header-button new-button" onclick="calculatePower()">Button 1</button>
         <button class="header-button new-button" onclick="calculateFromImage()">Button 2</button>
-        <button class="header-button" onclick="showOhmLawCalculator()">Закон Ома</button>
+        <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">Закон Ома</button>
     </div>
     
     <!-- Основной калькулятор -->
@@ -260,48 +198,16 @@
         </div>
     </div>
 
-    <!-- Калькулятор закона Ома -->
-    <div class="calculator ohm-law-calculator" id="ohmLawCalculator">
-        <!-- Поля ввода для закона Ома -->
-        <div class="input-group">
-            <span class="input-label">U</span>
-            <input type="number" id="voltage" placeholder="Напряжение (V)">
-        </div>
-        <div class="input-group">
-            <span class="input-label">I</span>
-            <input type="number" id="current" placeholder="Ток (I)">
-        </div>
-        <div class="input-group">
-            <span class="input-label">R</span>
-            <input type="number" id="resistance" placeholder="Сопротивление (R)">
-        </div>
-        <div class="input-group">
-            <span class="input-label">P</span>
-            <input type="number" id="power" placeholder="Мощность (P)">
-        </div>
-        <!-- Кнопки для расчета и сброса -->
-        <div style="display: flex; gap: 10px;">
-            <button onclick="calculateOhmLaw()">Рассчитать</button>
-            <button onclick="resetOhmLawCalculator()">Сброс</button>
-        </div>
-        <!-- Блок для вывода результата -->
-        <div class="result" id="ohmLawResult"></div>
-    </div>
-
     <script>
-        // Переменные для хранения текущего значения, предыдущего значения и операции
         let currentValue = '0';
         let previousValue = null;
         let operation = null;
         
-        // Функция для обновления экрана калькулятора
         function updateDisplay() {
             document.getElementById('display').value = currentValue;
         }
 
-        // Функция для добавления цифры на экран
         function appendNumber(num) {
-            vibrate(); // Виброотклик
             if (currentValue === '0' && num !== '.') {
                 currentValue = num;
             } else {
@@ -311,40 +217,30 @@
             updateDisplay();
         }
 
-        // Функция для добавления оператора
         function appendOperator(op) {
-            vibrate(); // Виброотклик
             previousValue = currentValue;
             currentValue = '0';
             operation = op;
         }
 
-        // Функция для очистки экрана
         function clearDisplay() {
-            vibrate(); // Виброотклик
             currentValue = '0';
             previousValue = null;
             operation = null;
             updateDisplay();
         }
 
-        // Функция для изменения знака числа
         function toggleSign() {
-            vibrate(); // Виброотклик
             currentValue = (parseFloat(currentValue) * -1).toString();
             updateDisplay();
         }
 
-        // Функция для добавления процента
         function appendPercentage() {
-            vibrate(); // Виброотклик
             currentValue = (parseFloat(currentValue) / 100).toString();
             updateDisplay();
         }
 
-        // Функция для выполнения расчета
         function calculate() {
-            vibrate(); // Виброотклик
             if (!operation || !previousValue) return;
             
             const prev = parseFloat(previousValue);
@@ -370,92 +266,23 @@
             updateDisplay();
         }
 
-        // Функция для показа основного калькулятора
-        function showCalculator() {
-            document.getElementById('standardCalculator').style.display = 'flex';
-            document.getElementById('ohmLawCalculator').style.display = 'none';
-        }
-
-        // Функция для показа калькулятора закона Ома
-        function showOhmLawCalculator() {
-            document.getElementById('standardCalculator').style.display = 'none';
-            document.getElementById('ohmLawCalculator').style.display = 'flex';
-        }
-
-        // Функция для расчета закона Ома
-        function calculateOhmLaw() {
-            const voltage = parseFloat(document.getElementById('voltage').value);
-            const current = parseFloat(document.getElementById('current').value);
-            const resistance = parseFloat(document.getElementById('resistance').value);
-            const power = parseFloat(document.getElementById('power').value);
-
-            let result = '';
-
-            if (!isNaN(voltage) && !isNaN(current)) {
-                // Если известны напряжение и ток
-                result = `R = ${(voltage / current).toFixed(2)} Ω, P = ${(voltage * current).toFixed(2)} W`;
-            } else if (!isNaN(voltage) && !isNaN(resistance)) {
-                // Если известны напряжение и сопротивление
-                const calculatedCurrent = voltage / resistance;
-                result = `I = ${calculatedCurrent.toFixed(2)} A, P = ${(voltage * calculatedCurrent).toFixed(2)} W`;
-            } else if (!isNaN(current) && !isNaN(resistance)) {
-                // Если известны ток и сопротивление
-                const calculatedVoltage = current * resistance;
-                result = `V = ${calculatedVoltage.toFixed(2)} V, P = ${(current * current * resistance).toFixed(2)} W`;
-            } else if (!isNaN(voltage) && !isNaN(power)) {
-                // Если известны напряжение и мощность
-                const calculatedCurrent = power / voltage;
-                result = `I = ${calculatedCurrent.toFixed(2)} A, R = ${(voltage / calculatedCurrent).toFixed(2)} Ω`;
-            } else if (!isNaN(current) && !isNaN(power)) {
-                // Если известны ток и мощность
-                const calculatedVoltage = power / current;
-                result = `V = ${calculatedVoltage.toFixed(2)} V, R = ${(calculatedVoltage / current).toFixed(2)} Ω`;
-            } else if (!isNaN(resistance) && !isNaN(power)) {
-                // Если известны сопротивление и мощность
-                const calculatedCurrent = Math.sqrt(power / resistance);
-                result = `I = ${calculatedCurrent.toFixed(2)} A, V = ${(calculatedCurrent * resistance).toFixed(2)} V`;
-            } else {
-                result = 'Введите два значения';
-            }
-
-            document.getElementById('ohmLawResult').textContent = result;
-        }
-
-        // Функция для сброса калькулятора закона Ома
-        function resetOhmLawCalculator() {
-            document.getElementById('voltage').value = '';
-            document.getElementById('current').value = '';
-            document.getElementById('resistance').value = '';
-            document.getElementById('power').value = '';
-            document.getElementById('ohmLawResult').textContent = '';
-        }
-
-        // Функция для расчета мощности (пример)
         function calculatePower() {
-            const voltage = 12; // Пример значения напряжения
-            const current = 2;  // Пример значения тока
-            const power = voltage * current; // Расчет мощности
+            const voltage = 12;
+            const current = 2;
+            const power = voltage * current;
 
             const result = `Мощность: ${power} W`;
-            alert(result); // Вывод результата в alert
+            alert(result);
         }
 
-        // Функция для расчета из изображения (пример)
         function calculateFromImage() {
-            const voltage = 12; // Пример значения напряжения
-            const current = 2;  // Пример значения тока
-            const resistance = 6; // Пример значения сопротивления
-            const power = voltage * current; // Расчет мощности
+            const voltage = 12;
+            const current = 2;
+            const resistance = 6;
+            const power = voltage * current;
 
             const result = `Напряжение: ${voltage} V, Ток: ${current} A, Сопротивление: ${resistance} Ω, Мощность: ${power} W`;
-            alert(result); // Вывод результата в alert
-        }
-
-        // Функция для вибрации
-        function vibrate() {
-            if (navigator.vibrate) {
-                navigator.vibrate(50); // Вибрация на 50 миллисекунд
-            }
+            alert(result);
         }
      </script>
 </body>
