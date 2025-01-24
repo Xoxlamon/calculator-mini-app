@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Калькулятор закона Ома</title>
+    <style>
+        /* Стили для калькулятора закона Ома */
+        .ohm-law-calculator {
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+            padding: 2vh;
+            background: #2F3A4C;
+            height: 100vh;
+        }
+
+        .ohm-law-calculator input {
+            width: 100%;
+            padding: 2vh;
+            font-size: 2.5vh;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+        }
+
+        .ohm-law-calculator button {
+            padding: 2vh;
+            font-size: 2.5vh;
+            border-radius: 10px;
+            border: none;
+            background: #ff9f0a;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .ohm-law-calculator button:active {
+            background: #cc7a00;
+        }
+
+        .ohm-law-calculator .result {
+            color: #000;
+            font-size: 3vh;
+            text-align: center;
+            padding: 2vh;
+            background: #f0f0f0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .ohm-law-calculator .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2vh;
+        }
+
+        .ohm-law-calculator .input-label {
+            font-size: 2.5vh;
+            color: #fff;
+            width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="ohm-law-calculator">
+        <div class="input-group">
+            <span class="input-label">U</span>
+            <input type="number" id="voltage" placeholder="Напряжение (V)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">I</span>
+            <input type="number" id="current" placeholder="Ток (I)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">R</span>
+            <input type="number" id="resistance" placeholder="Сопротивление (R)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">P</span>
+            <input type="number" id="power" placeholder="Мощность (P)">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="calculateOhmLaw()">Рассчитать</button>
+            <button onclick="resetOhmLawCalculator()">Сброс</button>
+        </div>
+        <div class="result" id="ohmLawResult"></div>
+    </div>
+
+    <script>
+        function calculateOhmLaw() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            const resistance = parseFloat(document.getElementById('resistance').value);
+            const power = parseFloat(document.getElementById('power').value);
+
+            let result = '';
+
+            if (!isNaN(voltage) && !isNaN(current)) {
+                result = `R = ${(voltage / current).toFixed(2)} Ω, P = ${(voltage * current).toFixed(2)} W`;
+            } else if (!isNaN(voltage) && !isNaN(resistance)) {
+                const calculatedCurrent = voltage / resistance;
+                result = `I = ${calculatedCurrent.toFixed(2)} A, P = ${(voltage * calculatedCurrent).toFixed(2)} W`;
+            } else if (!isNaN(current) && !isNaN(resistance)) {
+                const calculatedVoltage = current * resistance;
+                result = `V = ${calculatedVoltage.toFixed(2)} V, P = ${(current * current * resistance).toFixed(2)} W`;
+            } else if (!isNaN(voltage) && !isNaN(power)) {
+                const calculatedCurrent = power / voltage;
+                result = `I = ${calculatedCurrent.toFixed(2)} A, R = ${(voltage / calculatedCurrent).toFixed(2)} Ω`;
+            } else if (!isNaN(current) && !isNaN(power)) {
+                const calculatedVoltage = power / current;
+                result = `V = ${calculatedVoltage.toFixed(2)} V, R = ${(calculatedVoltage / current).toFixed(2)} Ω`;
+            } else if (!isNaN(resistance) && !isNaN(power)) {
+                const calculatedCurrent = Math.sqrt(power / resistance);
+                result = `I = ${calculatedCurrent.toFixed(2)} A, V = ${(calculatedCurrent * resistance).toFixed(2)} V`;
+            } else {
+                result = 'Введите два значения';
+            }
+
+            document.getElementById('ohmLawResult').textContent = result;
+        }
+
+        function resetOhmLawCalculator() {
+            document.getElementById('voltage').value = '';
+            document.getElementById('current').value = '';
+            document.getElementById('resistance').value = '';
+            document.getElementById('power').value = '';
+            document.getElementById('ohmLawResult').textContent = '';
+        }
+    </script>
+</body>
+</html>
