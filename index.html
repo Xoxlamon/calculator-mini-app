@@ -224,7 +224,10 @@
         <input type="number" id="current" placeholder="Ток (I)">
         <input type="number" id="resistance" placeholder="Сопротивление (R)">
         <input type="number" id="power" placeholder="Мощность (P)">
-        <button onclick="calculateOhmLaw()">Рассчитать</button>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="calculateOhmLaw()">Рассчитать</button>
+            <button onclick="resetOhmLawCalculator()">Сброс</button>
+        </div>
         <div class="result" id="ohmLawResult"></div>
     </div>
 
@@ -342,6 +345,14 @@
             }
 
             document.getElementById('ohmLawResult').textContent = result;
+        }
+
+        function resetOhmLawCalculator() {
+            document.getElementById('voltage').value = '';
+            document.getElementById('current').value = '';
+            document.getElementById('resistance').value = '';
+            document.getElementById('power').value = '';
+            document.getElementById('ohmLawResult').textContent = '';
         }
 
         function calculatePower() {
