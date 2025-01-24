@@ -42,6 +42,11 @@
             cursor: pointer;
         }
 
+        .header-button.new-button {
+            background: #4CAF50; /* Зеленый цвет для новых кнопок */
+            margin-left: 10px; /* Отступ между кнопками */
+        }
+
         .calculator {
             position: fixed;
             top: 60px;
@@ -179,6 +184,8 @@
 <body>
     <div class="header">
         <button class="header-button" onclick="showCalculator()">домой</button>
+        <button class="header-button new-button" onclick="alert('Button 1 clicked')">Button 1</button>
+        <button class="header-button new-button" onclick="alert('Button 2 clicked')">Button 2</button>
         <button class="header-button" onclick="showOhmLawCalculator()">Закон Ома</button>
     </div>
     
