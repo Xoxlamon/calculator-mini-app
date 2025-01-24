@@ -179,6 +179,20 @@
             border-radius: 10px;
             border: 1px solid #ccc;
         }
+
+        .ohm-law-calculator .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2vh;
+        }
+
+        .ohm-law-calculator .input-label {
+            font-size: 2.5vh;
+            color: #fff;
+            width: 20px; /* Фиксированная ширина для выравнивания */
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -220,10 +234,22 @@
     </div>
 
     <div class="calculator ohm-law-calculator" id="ohmLawCalculator">
-        <input type="number" id="voltage" placeholder="Напряжение (V)">
-        <input type="number" id="current" placeholder="Ток (I)">
-        <input type="number" id="resistance" placeholder="Сопротивление (R)">
-        <input type="number" id="power" placeholder="Мощность (P)">
+        <div class="input-group">
+            <span class="input-label">U</span>
+            <input type="number" id="voltage" placeholder="Напряжение (V)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">I</span>
+            <input type="number" id="current" placeholder="Ток (I)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">R</span>
+            <input type="number" id="resistance" placeholder="Сопротивление (R)">
+        </div>
+        <div class="input-group">
+            <span class="input-label">P</span>
+            <input type="number" id="power" placeholder="Мощность (P)">
+        </div>
         <div style="display: flex; gap: 10px;">
             <button onclick="calculateOhmLaw()">Рассчитать</button>
             <button onclick="resetOhmLawCalculator()">Сброс</button>
