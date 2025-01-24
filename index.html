@@ -69,7 +69,7 @@
         /* Стили для экрана калькулятора */
         .display {
             color: white; /* Белый текст */
-            font-size: 9.5vh; /* Крупный шрифт */
+            font-size: 7.5vh; /* Крупный шрифт */
             text-align: right; /* Выравнивание текста по правому краю */
             padding: 3vh 10px;
             background: #000; /* Черный фон */
@@ -104,8 +104,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            width: 11vh;
-            height: 11vh;
+            width: 10vh;
+            height: 10vh;
             margin: 0.5vh; /* Равномерное расстояние от стенок */
         }
 
@@ -301,6 +301,7 @@
 
         // Функция для добавления цифры на экран
         function appendNumber(num) {
+            vibrate(); // Виброотклик
             if (currentValue === '0' && num !== '.') {
                 currentValue = num;
             } else {
@@ -312,6 +313,7 @@
 
         // Функция для добавления оператора
         function appendOperator(op) {
+            vibrate(); // Виброотклик
             previousValue = currentValue;
             currentValue = '0';
             operation = op;
@@ -319,6 +321,7 @@
 
         // Функция для очистки экрана
         function clearDisplay() {
+            vibrate(); // Виброотклик
             currentValue = '0';
             previousValue = null;
             operation = null;
@@ -327,18 +330,21 @@
 
         // Функция для изменения знака числа
         function toggleSign() {
+            vibrate(); // Виброотклик
             currentValue = (parseFloat(currentValue) * -1).toString();
             updateDisplay();
         }
 
         // Функция для добавления процента
         function appendPercentage() {
+            vibrate(); // Виброотклик
             currentValue = (parseFloat(currentValue) / 100).toString();
             updateDisplay();
         }
 
         // Функция для выполнения расчета
         function calculate() {
+            vibrate(); // Виброотклик
             if (!operation || !previousValue) return;
             
             const prev = parseFloat(previousValue);
@@ -443,6 +449,13 @@
 
             const result = `Напряжение: ${voltage} V, Ток: ${current} A, Сопротивление: ${resistance} Ω, Мощность: ${power} W`;
             alert(result); // Вывод результата в alert
+        }
+
+        // Функция для вибрации
+        function vibrate() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // Вибрация на 50 миллисекунд
+            }
         }
      </script>
 </body>
