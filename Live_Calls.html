@@ -96,7 +96,11 @@
     </style>
 </head>
 <body>
-<div class="container">
+   
+<div class="container"><!-- Шапка с кнопкой "Вернуться назад" -->
+    <div class="header">
+        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
+    </div>
     <h1 style="text-align: center;">Расчет времени с вашего дня рождения</h1>
     <form id="birthdayForm">
         <div class="form-group">
@@ -118,6 +122,7 @@
                 <option value="70">70 лет</option>
                 <option value="60">60 лет</option>
                 <option value="50">50 лет</option>
+                <option value="45">45 лет</option>
                 <option value="40">40 лет</option>
                 <option value="30">30 лет</option>
             </select>
@@ -126,7 +131,7 @@
             <label for="scaleLengthInput">Введите количество лет:</label>
             <input type="number" id="scaleLengthInput" min="1" value="90" required>
         </div>
-        <button type="submit">Рассчитать</button>
+        
         <button type="button" id="resetButton">Сброс</button>
     </form>
     <div id="ageInfo"></div>
