@@ -3,251 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>День Рождения</title>
+    <title>Инженерный калькулятор</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #2c2c32;
-            color: #333;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            position: relative;
         }
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            background-color: #9eb1b3;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 5px 10px; /* Уменьшаем padding */
+            font-size: 14px; /* Уменьшаем размер шрифта */
+            cursor: pointer;
+            border: none;
             border-radius: 5px;
-            width: 90%;
-            max-width: 600px;
+            background-color: #007BFF;
+            color: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
-        .form-group {
-            margin-bottom: 15px;
+        #calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="date"], select, input[type="number"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            text-align: right;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
+            border-radius: 5px;
         }
         button {
-            width: 100%;
-            padding: 10px 15px;
-            background-color: #007aff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
+            width: 23%;
+            padding: 15px;
+            margin: 1%;
+            font-size: 18px;
             cursor: pointer;
-            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #f0f0f0;
         }
         button:hover {
-            background-color: #005bbd;
+            background-color: #fff;
         }
-        .progress-container {
-            width: 100%;
-            background-color: #e0e0df;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        .progress-bar {
-            height: 30px;
-            width: 0;
-            background-color: #4caf50;
+        button.operator {
+            background-color: #ff9500;
             color: white;
-            text-align: center;
-            line-height: 30px;
         }
-        .info {
-            margin-top: 20px;
+        button.operator:hover {
+            background-color: #e08900;
         }
-        .big-font {
-            font-size: 1.2em;
+        button.equals {
+            background-color: #34c759;
+            color: white;
+            width: 48%;
         }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-                width: 95%;
-            }
-            h1 {
-                font-size: 1.5em;
-            }
-            label {
-                font-size: 0.9em;
-            }
-            input[type="date"], select, input[type="number"], button {
-                font-size: 0.9em;
-            }
-            .progress-container {
-                margin-top: 10px;
-            }
+        button.equals:hover {
+            background-color: #2da94f;
+        }
+        button.clear {
+            background-color: #ff3b30;
+            color: white;
+        }
+        button.clear:hover {
+            background-color: #e63329;
         }
     </style>
 </head>
 <body>
-   
-<div class="container"><!-- Шапка с кнопкой "Вернуться назад" -->
-    <div class="header">
-        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
+    <button id="backButton" onclick="window.history.back()">Назад</button>
+    <div id="calculator">
+        <input type="text" id="display" disabled>
+        <div>
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button onclick="appendToDisplay('/')" class="operator">/</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('*')" class="operator">*</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('-')" class="operator">-</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('+')" class="operator">+</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="calculateResult()" class="equals">=</button>
+        </div>
     </div>
-    <h1 style="text-align: center;">Расчет времени с вашего дня рождения</h1>
-    <form id="birthdayForm">
-        <div class="form-group">
-            <label for="birthDate">Введите ваш день рождения (ДД.ММ.ГГГГ):</label>
-            <input type="date" id="birthDate" class="big-font" required>
-        </div>
-        <div class="form-group">
-            <label for="scaleType">Выберите способ выбора года:</label><br>
-            <input type="radio" id="selectYear" name="scaleType" value="select" checked>
-            <label for="selectYear">Выбрать из списка</label><br>
-            <input type="radio" id="inputYear" name="scaleType" value="input">
-            <label for="inputYear">Ввести самостоятельно</label><br>
-        </div>
-        <div id="yearSelection" class="form-group">
-            <label for="scaleLength">Выберите сколько лет вы планируете прожить:</label>
-            <select id="scaleLength" required>
-                <option value="90">90 лет</option>
-                <option value="80">80 лет</option>
-                <option value="70">70 лет</option>
-                <option value="60">60 лет</option>
-                <option value="50">50 лет</option>
-                <option value="45">45 лет</option>
-                <option value="40">40 лет</option>
-                <option value="30">30 лет</option>
-            </select>
-        </div>
-        <div id="yearInput" class="form-group" style="display: none;">
-            <label for="scaleLengthInput">Введите количество лет:</label>
-            <input type="number" id="scaleLengthInput" min="1" value="90" required>
-        </div>
-        
-        <button type="button" id="resetButton">Сброс</button>
-    </form>
-    <div id="ageInfo"></div>
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div class="info" id="totalDaysInfo"></div>
-    <div class="info" id="yearsLeftInfo"></div>
-</div>
-
-<script>
-    const form = document.getElementById('birthdayForm');
-    const birthDateInput = document.getElementById('birthDate');
-    const selectYearRadio = document.getElementById('selectYear');
-    const inputYearRadio = document.getElementById('inputYear');
-    const yearSelection = document.getElementById('yearSelection');
-    const yearInput = document.getElementById('yearInput');
-    const scaleLengthSelect = document.getElementById('scaleLength');
-    const scaleLengthInput = document.getElementById('scaleLengthInput');
-    const resetButton = document.getElementById('resetButton');
-    const ageInfo = document.getElementById('ageInfo');
-    const progressBar = document.getElementById('progressBar');
-    const totalDaysInfo = document.getElementById('totalDaysInfo');
-    const yearsLeftInfo = document.getElementById('yearsLeftInfo');
-
-    function calculateAge(birthDate, today) {
-        const oneDay = 24 * 60 * 60 * 1000;
-        const oneMonth = 30 * oneDay;
-        const oneYear = 365 * oneDay;
-
-        let ageYears = Math.floor((today - birthDate) / oneYear);
-        let remainingDays = (today - birthDate) % oneYear;
-        let ageMonths = Math.floor(remainingDays / oneMonth);
-        let ageDays = Math.floor(remainingDays % oneMonth / oneDay);
-
-        return { ageYears, ageMonths, ageDays };
-    }
-
-    function updateProgressBar(currentYears, targetYears) {
-        progressBar.style.width = ((currentYears / targetYears) * 100) + '%';
-        progressBar.textContent = `${currentYears} из ${targetYears} лет`;
-    }
-
-    function updateTotalDaysInfo(totalDays) {
-        totalDaysInfo.textContent = `Всего прошло ${totalDays} дней.`;
-    }
-
-    function displayAgeInfo(age, targetYears) {
-        ageInfo.textContent = `Прошло ${age.ageYears} лет, ${age.ageMonths} месяцев и ${age.ageDays} дней до ${targetYears} лет.`;
-    }
-
-    function displayYearsLeft(targetYears) {
-        const birthDateString = birthDateInput.value;
-        const birthDate = new Date(birthDateString);
-        const today = new Date();
-        const age = calculateAge(birthDate, today);
-        const yearsLeft = targetYears - age.ageYears;
-
-        yearsLeftInfo.textContent = `Осталось ${yearsLeft} лет до ${targetYears} лет.`;
-    }
-
-    function updateData() {
-        const birthDateString = birthDateInput.value;
-        const scaleType = document.querySelector('input[name="scaleType"]:checked').value;
-        let scaleLength;
-        if (scaleType === 'select') {
-            scaleLength = parseInt(scaleLengthSelect.value, 10);
-        } else {
-            scaleLength = parseInt(scaleLengthInput.value, 10);
+    <script>
+        function appendToDisplay(value) {
+            const display = document.getElementById("display");
+            display.value += value;
         }
-
-        const birthDate = new Date(birthDateString);
-        const today = new Date();
-
-        if (!isNaN(birthDate.getTime())) {
-            const age = calculateAge(birthDate, today);
-            const totalDays = Math.floor((today - birthDate) / (24 * 60 * 60 * 1000));
-            const currentYears = age.ageYears;
-
-            displayAgeInfo(age, scaleLength);
-            updateProgressBar(currentYears, scaleLength);
-            updateTotalDaysInfo(totalDays);
-            displayYearsLeft(scaleLength);
-        } else {
-            alert('Пожалуйста, введите корректную дату.');
+        function clearDisplay() {
+            document.getElementById("display").value = '';
         }
-    }
-
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        updateData();
-    });
-
-    resetButton.addEventListener('click', function() {
-        birthDateInput.value = '';
-        selectYearRadio.checked = true;
-        scaleLengthSelect.value = '90';
-        scaleLengthInput.value = '90';
-        ageInfo.textContent = '';
-        progressBar.style.width = '0%';
-        progressBar.textContent = '';
-        totalDaysInfo.textContent = '';
-        yearsLeftInfo.textContent = '';
-    });
-
-    selectYearRadio.addEventListener('change', function() {
-        yearSelection.style.display = 'block';
-        yearInput.style.display = 'none';
-    });
-
-    inputYearRadio.addEventListener('change', function() {
-        yearSelection.style.display = 'none';
-        yearInput.style.display = 'block';
-    });
-
-    setInterval(updateData, 1000);
-</script>
+        function calculateResult() {
+            const display = document.getElementById("display");
+            try {
+                // Заменяем символы для корректного вычисления
+                let expression = display.value.replace(/×/g, '*').replace(/÷/g, '/');
+                // Проверка на деление на ноль
+                if (/\/\s*0/.test(expression)) {
+                    throw new Error("Деление на ноль");
+                }
+                // Вычисляем результат
+                const result = eval(expression);
+                display.value = result;
+            } catch (error) {
+                display.value = 'Ошибка';
+            }
+        }
+    </script>
 </body>
 </html>
