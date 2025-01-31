@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Инженерный калькулятор</title>
     <style>
@@ -14,6 +13,20 @@
             height: 100vh;
             background-color: #f4f4f4;
             margin: 0;
+            position: relative;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
         #calculator {
             background: white;
@@ -69,67 +82,63 @@
     </style>
 </head>
 <body>
-
-<div id="calculator">
-    <input type="text" id="display" disabled>
-    <div>
-        <button onclick="clearDisplay()" class="clear">C</button>
-        <button onclick="appendToDisplay('(')">(</button>
-        <button onclick="appendToDisplay(')')">)</button>
-        <button onclick="appendToDisplay('/')" class="operator">/</button>
+    <button id="backButton" onclick="window.history.back()">Назад</button>
+    <div id="calculator">
+        <input type="text" id="display" disabled>
+        <div>
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button onclick="appendToDisplay('/')" class="operator">/</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('*')" class="operator">*</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('-')" class="operator">-</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('+')" class="operator">+</button>
+        </div>
+        <div>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="calculateResult()" class="equals">=</button>
+        </div>
     </div>
-    <div>
-        <button onclick="appendToDisplay('7')">7</button>
-        <button onclick="appendToDisplay('8')">8</button>
-        <button onclick="appendToDisplay('9')">9</button>
-        <button onclick="appendToDisplay('*')" class="operator">*</button>
-    </div>
-    <div>
-        <button onclick="appendToDisplay('4')">4</button>
-        <button onclick="appendToDisplay('5')">5</button>
-        <button onclick="appendToDisplay('6')">6</button>
-        <button onclick="appendToDisplay('-')" class="operator">-</button>
-    </div>
-    <div>
-        <button onclick="appendToDisplay('1')">1</button>
-        <button onclick="appendToDisplay('2')">2</button>
-        <button onclick="appendToDisplay('3')">3</button>
-        <button onclick="appendToDisplay('+')" class="operator">+</button>
-    </div>
-    <div>
-        <button onclick="appendToDisplay('0')">0</button>
-        <button onclick="appendToDisplay('.')">.</button>
-        <button onclick="calculateResult()" class="equals">=</button>
-    </div>
-</div>
-
-<script>
-    function appendToDisplay(value) {
-        const display = document.getElementById("display");
-        display.value += value;
-    }
-
-    function clearDisplay() {
-        document.getElementById("display").value = '';
-    }
-
-    function calculateResult() {
-        const display = document.getElementById("display");
-        try {
-            // Заменяем символы для корректного вычисления
-            let expression = display.value.replace(/×/g, '*').replace(/÷/g, '/');
-            // Проверка на деление на ноль
-            if (/\/\s*0/.test(expression)) {
-                throw new Error("Деление на ноль");
-            }
-            // Вычисляем результат
-            const result = eval(expression);
-            display.value = result;
-        } catch (error) {
-            display.value = 'Ошибка';
+    <script>
+        function appendToDisplay(value) {
+            const display = document.getElementById("display");
+            display.value += value;
         }
-    }
-</script>
-
+        function clearDisplay() {
+            document.getElementById("display").value = '';
+        }
+        function calculateResult() {
+            const display = document.getElementById("display");
+            try {
+                // Заменяем символы для корректного вычисления
+                let expression = display.value.replace(/×/g, '*').replace(/÷/g, '/');
+                // Проверка на деление на ноль
+                if (/\/\s*0/.test(expression)) {
+                    throw new Error("Деление на ноль");
+                }
+                // Вычисляем результат
+                const result = eval(expression);
+                display.value = result;
+            } catch (error) {
+                display.value = 'Ошибка';
+            }
+        }
+    </script>
 </body>
 </html>

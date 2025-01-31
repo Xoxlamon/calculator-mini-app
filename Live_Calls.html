@@ -9,7 +9,7 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8f8fa;
+            background-color: #2c2c32;
             color: #333;
             display: flex;
             justify-content: center;
@@ -19,7 +19,7 @@
         .container {
             max-width: 100%;
             padding: 20px;
-            background-color: #fff;
+            background-color: #9eb1b3;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             width: 90%;
@@ -97,10 +97,7 @@
 </head>
 <body>
    
-<div class="container"><!-- Шапка с кнопкой "Вернуться назад" -->
-    <div class="header">
-        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
-    </div>
+<div class="container">
     <h1 style="text-align: center;">Расчет времени с вашего дня рождения</h1>
     <form id="birthdayForm">
         <div class="form-group">
@@ -121,7 +118,7 @@
                 <option value="80">80 лет</option>
                 <option value="70">70 лет</option>
                 <option value="60">60 лет</option>
-                <option value="55">55 лет</option>
+                <option value="50">50 лет</option>
                 <option value="45">45 лет</option>
                 <option value="40">40 лет</option>
                 <option value="30">30 лет</option>
@@ -247,7 +244,7 @@
         yearInput.style.display = 'block';
     });
 
-    setInterval(updateData, 3000);
+    setInterval(updateData, 1000);
 </script>
 </body>
 </html>
