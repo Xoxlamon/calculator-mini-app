@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расчет пени</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Расчет пени за неуплату</h1>
+<p>Введите сумму задолженности, ключевую ставку и количество дней просрочки для расчета пени.</p>
+
+<label for="debt">Сумма задолженности (руб.):</label>
+<input type="number" id="debt" placeholder="Введите сумму" required>
+
+<label for="rate">Ключевая ставка (%):</label>
+<input type="number" id="rate" value="21" required>
+
+<label for="days">Количество дней просрочки:</label>
+<input type="number" id="days" placeholder="Введите количество дней" required>
+
+<button onclick="calculatePenalty()">Рассчитать пеню</button>
+
+<div class="result" id="result"></div>
+
+<script>
+    function calculatePenalty() {
+        const debt = parseFloat(document.getElementById('debt').value);
+        const rate = parseFloat(document.getElementById('rate').value) / 100; // Преобразуем в доли
+        const days = parseInt(document.getElementById('days').value);
+
+        const penalty = debt * rate * (1 / 300) * days;
+
+        document.getElementById('result').innerText = 'Пеня составляет: ' + penalty.toFixed(2) + ' рублей';
+    }
+</script>
+
+</body>
+</html>
