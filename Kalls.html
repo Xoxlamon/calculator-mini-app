@@ -25,6 +25,7 @@
             align-items: center;
             padding: 15px;
             transition: background 0.4s;
+            position: relative;
         }
 
         body.dark-theme {
@@ -32,10 +33,46 @@
             color: #e0e0e0;
         }
 
-        .theme-toggle {
+        /* Хедер с кнопками */
+        .header {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none; /* Чтобы не перекрывал клики, но кнопки будут с pointer-events: auto */
+        }
+
+        .header > * {
+            pointer-events: auto;
+        }
+
+        .header-button {
+            background: #082667;
+            border: none;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .header-button:hover {
+            background: #0a3080;
+            transform: translateY(-1px);
+        }
+
+        .header-button:active {
+            transform: translateY(0);
+        }
+
+        .theme-toggle {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             width: 40px;
@@ -49,10 +86,12 @@
             font-size: 18px;
             backdrop-filter: blur(5px);
             transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
         .container {
@@ -62,7 +101,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             padding: 25px;
-            margin-top: 20px;
+            margin-top: 70px; /* Отступ под хедер */
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -493,7 +532,24 @@
             font-size: 0.95rem;
         }
 
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        body.dark-theme .footer-text {
+            color: #aaa;
+        }
+
         @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
             .button-group {
                 flex-direction: column;
             }
@@ -518,6 +574,7 @@
         @media (max-width: 480px) {
             .container {
                 padding: 15px;
+                margin-top: 90px;
             }
             .table-section {
                 min-width: 100%;
@@ -526,28 +583,14 @@
                 flex-direction: column;
             }
         }
-         .header-button {
-    background: #082667;
-    border: none;
-    color: #fff;
-    padding: 6px 18px;
-    border-radius: 16px;
-    font-size: 12px;
-    cursor: pointer;
-}
-        .back-button:hover {
-            background-color: var(--button-hover-clear);
-        }
     </style>
 </head>
 <body>
-     <div class="header>
-        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
-    <!-- Переключатель темы -->
-    <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему">
-        🌙
-    </button>
-             </div>
+    <!-- Хедер с кнопками -->
+    <div class="header">
+        <button class="header-button" id="back-btn" title="Вернуться на главную">← Назад</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему">🌙</button>
+    </div>
 
     <div class="container">
         <h1>Калькулятор состояния автомобильного аккумулятора</h1>
@@ -607,7 +650,7 @@
                 <thead>
                     <tr>
                         <th>Климатическая зона</th>
-                        <th>Средняя зимняя температура, °C</th>
+                        <th>Средняя зимняя температура, °C</th>
                         <th>Нормальная плотность (г/см³)</th>
                         <th>Для полностью заряженной АКБ (г/см³)</th>
                     </tr>
@@ -621,7 +664,7 @@
                 </tbody>
             </table>
 
-            <h3>🔋 Таблица зависимости плотности электролита от уровня заряда (+25 °C)</h3>
+            <h3>🔋 Таблица зависимости плотности электролита от уровня заряда (+25 °C)</h3>
             <p>Эти данные используются при проверке ареометром для оценки степени заряженности АКБ:</p>
             <table>
                 <thead>
@@ -629,7 +672,7 @@
                         <th>Уровень заряда АКБ (%)</th>
                         <th>Плотность электролита (г/см³)</th>
                         <th>Напряжение на банку (В)</th>
-                        <th>Напряжение АКБ 12 В (В)</th>
+                        <th>Напряжение АКБ 12 В (В)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -644,17 +687,17 @@
             <h3>🔬 Принцип изменения плотности</h3>
             <ul>
                 <li>При зарядке аккумулятора концентрация серной кислоты увеличивается, и плотность электролита растёт — это показатель заряженности.</li>
-                <li>При разряде часть кислоты связывается с пластинами, и плотность раствора падает, приближаясь к плотности воды (около 1.00 г/см³).</li>
-                <li>Разница между полностью заряженным и полностью разряженным состоянием составляет примерно <strong>0.13–0.15 г/см³</strong>.</li>
+                <li>При разряде часть кислоты связывается с пластинами, и плотность раствора падает, приближаясь к плотности воды (около 1.00 г/см³).</li>
+                <li>Разница между полностью заряженным и полностью разряженным состоянием составляет примерно <strong>0.13–0.15 г/см³</strong>.</li>
             </ul>
 
             <h3>🌡️ Температурная коррекция</h3>
             <p>При изменении температуры электролита измерения нужно корректировать:</p>
             <ul>
-                <li>На <strong>каждые +10 °C</strong> выше 25 °C — <strong>вычитается 0.007 г/см³</strong>.</li>
-                <li>На <strong>каждые −10 °C</strong> ниже 25 °C — <strong>прибавляется 0.007 г/см³</strong>.</li>
+                <li>На <strong>каждые +10 °C</strong> выше 25 °C — <strong>вычитается 0.007 г/см³</strong>.</li>
+                <li>На <strong>каждые −10 °C</strong> ниже 25 °C — <strong>прибавляется 0.007 г/см³</strong>.</li>
             </ul>
-            <p>Пример: если плотность 1.25 г/см³ измерена при +5 °C, приведённое значение составит около <strong>1.26 г/см³</strong>, что соответствует примерно <strong>80 % заряда</strong>.</p>
+            <p>Пример: если плотность 1.25 г/см³ измерена при +5 °C, приведённое значение составит около <strong>1.26 г/см³</strong>, что соответствует примерно <strong>80 % заряда</strong>.</p>
 
             <h3>⚠️ Признаки износа аккумулятора</h3>
             <ul>
@@ -788,6 +831,19 @@
             const faqToggle = document.getElementById('faq-toggle');
             const faqContent = document.getElementById('faq-content');
             const themeToggle = document.getElementById('theme-toggle');
+            const backBtn = document.getElementById('back-btn');
+
+            // === КНОПКА "НАЗАД" ===
+            backBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Сначала пробуем историю браузера
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    // Если истории нет — переходим на index.html
+                    window.location.href = 'index.html';
+                }
+            });
 
             // Тема
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -810,7 +866,7 @@
                     : '❓ Часто задаваемые вопросы (FAQ)';
             });
 
-            // ✅ ИСПРАВЛЕННАЯ ФУНКЦИЯ — корректная оценка состояния (SOH)
+            // Функция расчёта состояния аккумулятора
             function calculateBatteryStatus(voltage) {
                 let percentage, status, description, recommendation;
 
@@ -839,7 +895,6 @@
                     recommendation = "Замена рекомендуется в ближайшее время. Не полагайтесь на него в экстремальных условиях.";
                 } 
                 else {
-                    // < 8.8 В — критическое состояние
                     percentage = Math.max(0, (voltage - 7.0) * 12.5);
                     if (percentage > 20) percentage = 20;
                     status = "Критическое состояние";
