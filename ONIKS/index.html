@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>    
+<meta charset="UTF-8">
+<title>ПСУ-2</title>
+<style>
+.nav-container {
+    position: fixed;         
+    top: 20px;
+    right: 20px;               /* ← 20px от правого края */
+    z-index: 1000;
+}
+
+.menu-toggle {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 60px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    display: block;            /* ← Убираем absolute позиционирование */
+}
+
+.menu-toggle:hover {
+    background: #555;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.dropdown-menu {
+    position: absolute;        /* ← Относительно nav-container */
+    top: 100%;
+    right: 0;                  /* ← Выравниваем по правому краю кнопки */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 220px;
+    z-index: 999;
+    overflow: hidden;
+}
+
+.nav-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.update-btn {
+    text-decoration: none !important;
+}
+
+.dropdown-item:hover {
+    background: #666;
+    color: white;
+    padding-left: 24px;
+}
+
+
+        #myFrame {
+            width: 100%;
+            border: none;
+            display: block; /* Убираем отступ снизу */
+            margin: 0 auto; /* Центрируем iframe */
+            border-radius: 20px;
+        }
+
+
+
+
+
+        * { box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 10px; 
+            padding-bottom: 20px;
+            max-width: 100%;
+            line-height: 1.4;
+            padding-top: 10px;
+        }
+        
+        /* 🎯 ИСПРАВЛЕННЫЕ КНОПКИ - видно все сразу */
+        .buttons-container {
+            display: flex; 
+            flex-direction: row;
+            gap: 8px; 
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* ✅ ПЕРЕНОС на новую строку */
+            padding: 10px;
+            max-width: 100%;
+            overflow: visible; /* ✅ Убрали скрытие */
+        }
+        .cabinet-btn {
+            padding: 12px 8px;
+            border: 2px solid #ddd; 
+            background: white;
+            text-align: center; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            transition: all 0.3s;
+            font-size: 15px;
+            font-weight: bold;
+            min-width: 90px; /* ✅ Меньше размер */
+            max-width: 110px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto; /* ✅ Адаптивный размер */
+        }
+/*        .cabinet-btn:hover, .cabinet-btn:active { 
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3); 
+            transform: translateY(-2px);
+        }*/
+        .cabinet-btn:hover { 
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3); 
+            transform: translateY(-10px);
+        }
+
+        .cabinet-btn.type-6_zone { 
+            background: #4CAF50; 
+            color: white; 
+            border-color: #45a049; 
+        }
+        .cabinet-btn.type-36_zone { 
+            background: #2196F3; 
+            color: white; 
+            border-color: #1976D2; 
+        }
+
+        .cabinet-btn.type-6_zone.active { 
+            box-shadow:
+                        0 8px 24px rgba(76, 175, 80, 0.6),
+                        0 0 40px rgba(76, 225, 80, 0.4);
+            transform: translateY(-10px); 
+            border-color: 0 0 40px rgba(76, 175, 80, 0.6);
+        }
+
+        .cabinet-btn.type-36_zone.active { 
+            box-shadow: 
+                        0 8px 24px rgba(33, 150, 243, 0.6),
+                        0 0 40px rgba(33, 200, 243, 0.4);
+            transform: translateY(-10px); 
+            border-color: 0 0 40px rgba(33, 150, 243, 0.6);                       
+        }
+
+
+        /* Остальные стили без изменений */
+        .change-btn {
+            background: #007bff; 
+            color: white; 
+            padding: 15px 25px; 
+            border: none;
+            border-radius: 8px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            display: block;
+            margin: 0 auto 20px;
+            touch-action: manipulation;
+            min-width: 200px;
+        }
+        .change-btn:hover, .change-btn:active { 
+            background: #0056b3; 
+        }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-content { 
+            background: white; 
+            margin: 10px auto; 
+            padding: 0; 
+            width: calc(100% - 20px);
+            max-width: 600px; 
+            max-height: calc(100vh - 20px);
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .modal-header { 
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px 12px 0 0; 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            margin: 0;
+            font-size: 20px;
+            flex: 1;
+        }
+        .close { 
+            font-size: 28px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            padding: 5px;
+            line-height: 1;
+            touch-action: manipulation;
+        }
+        .close:hover, .close:active { 
+            opacity: 0.8; 
+            color: #ff4444;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: calc(80vh - 80px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Компактные настройки */
+        .cabinet-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 480px) {
+            .cabinet-settings {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 12px;
+            }
+        }
+        
+        .cabinet-setting {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .setting-name { 
+            font-weight: bold; 
+            font-size: 14px; 
+            margin-bottom: 12px; 
+            color: #333;
+            text-align: center;
+            padding: 8px 0;
+            background: rgba(0,123,255,0.05);
+            border-radius: 4px;
+        }
+        
+        .form-row { 
+            display: flex; 
+            flex-direction: column;
+            gap: 4px; 
+            margin-bottom: 10px;
+        }
+        @media (min-width: 500px) {
+            .form-row { 
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+            }
+            .form-row label {
+                min-width: 45px;
+                font-size: 13px;
+            }
+        }
+        
+        label { 
+            font-weight: 600; 
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+        
+        input[type="text"], select { 
+            padding: 8px 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 14px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        
+        .show-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .show-row label {
+            margin: 0;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+        input[type="checkbox"] { 
+            transform: scale(1.3); 
+            margin: 0;
+            accent-color: #28a745;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white; 
+            padding: 16px 24px; 
+            border: none;
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            width: 100%;
+            touch-action: manipulation;
+            box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+        }
+        .save-btn:hover, .save-btn:active { 
+            background: linear-gradient(135deg, #218838, #1e7e34);
+            transform: translateY(-1px);
+        }
+        
+        .form-input { background-color: #fff; }
+
+        
+        @media (max-width: 480px) {
+            body { margin: 5px; }
+            .cabinet-btn { 
+                min-width: 85px; 
+                max-width: 100px;
+                font-size: 13px; 
+                height: 55px;
+                padding: 10px 6px;
+            }
+            .modal-content { margin: 5px auto; width: calc(100% - 10px); }
+            .modal-body { padding: 15px; }
+            .cabinet-setting { padding: 12px; }
+            .setting-name { font-size: 13px; padding: 6px 0; }
+        }
+    </style>
+</head>
+<body>
+<!--     <div class="nav-container">
+        <button class="nav-button" onclick="loadContent('/terminal', this)">Терминал</button>
+        <button class="nav-button" onclick="openSettingsModal()">Изменить шкафы</button>
+        <button class="nav-button" onclick="location.href='/update'">Обновить прошивку</button>
+    </div> -->
+
+    <div class="nav-container">
+    <button class="menu-toggle">☰ Меню</button>
+    <div class="dropdown-menu">
+        <button class="dropdown-item nav-button" onclick="loadContent('/terminal', this)">Терминал</button>
+        <button class="dropdown-item nav-button" onclick="openSettingsModal()">Изменить шкафы</button>
+        <a class="dropdown-item nav-button" href="/update">Обновить прошивку</a>
+    </div>
+    </div>
+
+    <div id="buttonsContainer" class="buttons-container"></div>
+    <!-- <button class="change-btn" onclick="openSettingsModal()">Изменить</button> -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Настройки шкафов</h1>
+                <span class="close" onclick="closeSettingsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="cabinetSettings" class="cabinet-settings"></div>
+                <button class="save-btn" onclick="saveAllChanges()">💾 Сохранить в LittleFS</button>
+            </div>
+        </div>
+    </div>
+
+
+    <iframe id="myFrame" src="" width="100%" height="1300px">
+        <p>Ваш браузер не поддерживает iframe.</p>
+    </iframe>
+
+    <script>
+
+    // Точные данные ИЗ вашего ESP кода
+const mqttHost = 'wss://m1.wqtt.ru:19157';  // WebSocket TLS порт!
+const options = {
+    connectTimeout: 15000,
+    keepalive: 60,
+    reconnectPeriod: 3000,
+    clientId: 'WebClient_' + Date.now(),
+    username: 'u_LQAPTV',        // ← ТОЧНО из вашего кода
+    password: 'bC4joft7',        // ← ТОЧНО из вашего кода
+    protocolVersion: 4,
+    rejectUnauthorized: false
+};
+
+const client = mqtt.connect(mqttHost, options);
+
+// ВАШИ топики из ESP кода
+let outTopic = 'ST8';  // Чтение сообщений от ESP
+//const inTopic = 'inTopic';    // Отправка команд на ESP
+
+client.on('connect', function() {
+    //document.getElementById('status').textContent = '✅ Подключено к WQTT.ru (m1.wqtt.ru:19157)';
+    //document.getElementById('status').className = 'connected';
+    
+    // Подписка на сообщения ОТ ESP
+    client.subscribe(outTopic, { qos: 1 });
+
+});
+
+client.on('message', function(topic, message) {
+    const msg = message.toString();
+    const iframe = document.getElementById('myFrame');
+    iframe.contentWindow.postMessage({ type: 'mqttMessage', topic: topic, payload: msg }, '*');
+});
+        
+
+    //var globalActiveST = " ";
+    var st_data_json = '';
+        function loadContent(url, button) {
+            const container = document.getElementById('buttonsContainer');
+
+            const allButtons = container.querySelectorAll('.cabinet-btn');
+            allButtons.forEach(button => button.classList.remove('active'));
+
+            // Добавляем класс 'active' текущей кнопке
+            button.classList.add('active');
+
+            // Загружаем контент во фрейм
+            const iframe = document.getElementById('myFrame');
+            iframe.src = url;
+        }
+
+function newLoadContent(name, type) {
+    client.unsubscribe(outTopic);
+    outTopic = "PSU6/" + name;
+    client.subscribe(outTopic, { qos: 1 });
+    
+    let url = '';
+    if(type === "6_zone") url = 'st_6.html';
+    if(type === "36_zone") url = 'st_36.html';
+    
+    // 🔥 КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: добавляем ?st=XX
+    const stNumber = name.replace('ST', ''); // ST11 → 11
+    const fullUrl = `${url}?st=${stNumber}`;
+    
+    const iframe = document.getElementById('myFrame');
+    iframe.src = fullUrl;
+}
+
+
+
+    let jsonData = null, displayData = null;
+        async function loadConfig() {
+            jsonData = {"cabinet":[{"name":"ST8","type":"6_zone","visible":true},{"name":"ST9","type":"6_zone","visible":true},{"name":"ST10","type":"36_zone","visible":true},{"name":"ST11","type":"36_zone","visible":true},{"name":"ST12","type":"36_zone","visible":true},{"name":"ST13","type":"6_zone","visible":true}]};
+            displayData = JSON.parse(JSON.stringify(jsonData));
+            displayCabinetButtons();
+        }
+
+        function displayCabinetButtons() {
+            const container = document.getElementById('buttonsContainer');
+            container.innerHTML = '';
+            displayData.cabinet.forEach(cabinet => {
+                if (cabinet.visible) {
+                    const btn = document.createElement('div');
+                    btn.className = `cabinet-btn type-${cabinet.type}`;
+                    btn.textContent = cabinet.name;
+
+            
+                    // ОБРАБОТЧИК КЛИКА
+                    btn.addEventListener('click', function() {
+                        newLoadContent(cabinet.name, cabinet.type);
+                        //console.log(cabinet.name);
+                        // Убираем active у ВСЕХ кнопок в контейнере
+                        const allButtons = container.querySelectorAll('.cabinet-btn');
+                        allButtons.forEach(button => button.classList.remove('active'));
+                        btn.classList.toggle('active');
+                        
+                    });
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function openSettingsModal() { 
+            if (jsonData) { 
+                renderSettingsForm(); 
+                document.getElementById('settingsModal').style.display = 'block'; 
+            } 
+        }
+        function closeSettingsModal() { 
+            document.getElementById('settingsModal').style.display = 'none'; 
+        }
+
+        function renderSettingsForm() {
+            const container = document.getElementById('cabinetSettings');
+            container.innerHTML = '';
+            jsonData.cabinet.forEach((cabinet, index) => {
+                const setting = document.createElement('div');
+                setting.className = 'cabinet-setting';
+                setting.dataset.index = index;
+                setting.innerHTML = `
+                    <div class="setting-name">${cabinet.name}</div>
+                    <div class="form-row">
+                        <label>Name:</label>
+                        <input type="text" class="form-input" value="${cabinet.name}">
+                    </div>
+                    <div class="form-row">
+                        <label>Тип:</label>
+                        <select class="form-input">
+                            <option value="6_zone" ${cabinet.type === '6_zone' ? 'selected' : ''}>6 зон</option>
+                            <option value="36_zone" ${cabinet.type === '36_zone' ? 'selected' : ''}>36 зон</option>
+                        </select>
+                    </div>
+                    <div class="show-row">
+                        <input type="checkbox" class="form-input" ${cabinet.visible ? 'checked' : ''}>
+                        <label>Показать</label>
+                    </div>
+                `;
+                container.appendChild(setting);
+            });
+        }
+
+        async function saveAllChanges() {
+            const settings = document.querySelectorAll('.cabinet-setting');
+            settings.forEach(setting => {
+                const index = parseInt(setting.dataset.index);
+                const inputs = setting.querySelectorAll('.form-input');
+                jsonData.cabinet[index].name = inputs[0].value;
+                jsonData.cabinet[index].type = inputs[1].value;
+                jsonData.cabinet[index].visible = inputs[2].checked;
+            });
+
+            try {
+                const response = await fetch('/saveConfig', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(jsonData)
+                });
+                if (response.ok) {
+                    displayData = JSON.parse(JSON.stringify(jsonData));
+                    displayCabinetButtons();
+                    closeSettingsModal();
+                    console.log('Шкафы сохранены!');
+                } else {
+                    console.log('Ошибка сохранения!');
+                }
+            } catch (error) {
+                console.log('Ошибка связи!');
+            }
+        }
+
+        loadConfig();
+        
+        window.onclick = e => { if (e.target.id === 'settingsModal') closeSettingsModal(); };
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSettingsModal(); });
+    </script>
+
+</body>
+</html>

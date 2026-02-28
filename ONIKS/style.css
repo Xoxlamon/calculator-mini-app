@@ -1,0 +1,82 @@
+body {
+    background-color: #656665;
+}
+table {
+    font-family: sans-serif;
+    text-align: left;
+    border-collapse: separate;
+    border-spacing: 5px;
+    background: #ece9f0;
+    color: #656665;
+    border: 16px solid #ece9f0;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+    font-size: smaller;
+    font-weight: bold;
+}
+        
+th {
+    background-color:#092cde;
+    color: white;
+    padding: 10px;
+ 
+}
+        
+td {
+    padding: 10px; /* Добавляем отступы внутри ячеек */
+    border: 1px solid #ddd; /* Светлая граница */
+    text-align: center;
+          
+}
+      
+tr:nth-child(even) td { 
+    background-color:#f9f9f9; /* Фон четных строк */ 
+}
+      
+tr:nth-child(odd) td { 
+    background-color:white; /* Фон нечетных строк */ 
+}
+          
+#serialData{
+	background-color:white;
+}
+          
+#div_1, #div_2, #div_3{
+    display: inline-flex;
+}
+
+#tb1, #tb2, #tb3{
+    margin-right: 15px;
+}
+#st1, #st2, #st3, #st4, #st5, #st6{
+    margin-right: 15px;
+}
+
+.heaters{
+    border-radius: 15px;
+    touch-action: manipulation;
+}
+
+.name_zone{
+    font-size: 26px;
+}
+
+.button {
+  background-color: #1CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.editing {
+  background-color: #fff3cd !important;
+  border: 2px solid #ffc107;
+  padding: 2px;
+  font-weight: bold;
+}
