@@ -2,15 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор температуры Pt100</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .calculator {
-            width: 400px;
-            margin: 50px auto;
+            width: 90%;
+            max-width: 400px;
+            margin: 60px auto 20px;
             padding: 20px;
             background-color: #fff;
             border: 1px solid #ddd;
@@ -37,6 +44,22 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* small back button */
+        .back-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 5px 8px;
+            font-size: 14px;
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
         }
         button:hover {
             background-color: #0069d9;
@@ -49,6 +72,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="goBack()">← Назад</button>
     <div class="calculator">
         <h2>Калькулятор температуры Pt100</h2>
         <label for="resistance">Сопротивление (Ω):</label>
@@ -57,15 +81,17 @@
         <label for="temperature">Температура (°C):</label>
         <input type="number" id="temperature" readonly>
         <div id="result"></div>
-        <button onclick="goBack()" style="margin-top:10px; background-color:#6c757d;">Назад</button>
     </div>
 
+    <div id="formula" style="text-align:center; margin-top:10px; flex-shrink:0;">&nbsp;</div>
     <script>
         function calculateTemperature() {
             let resistance = parseFloat(document.getElementById('resistance').value);
             let temperature = (resistance - 100) / 0.385; // Примерная формула для Pt100
             document.getElementById('temperature').value = temperature.toFixed(2);
             document.getElementById('result').innerText = `Рассчитанная температура: ${temperature.toFixed(2)} °C`;
+            // show formula at bottom
+            document.getElementById('formula').innerText = `T = (R - 100) / 0.385`;
         }
         
         function goBack() {
