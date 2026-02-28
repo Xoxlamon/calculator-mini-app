@@ -25,8 +25,8 @@
         /* Стили для шапки */
         .header {
             display: flex;
-            justify-content: space-between;
-            padding: 12px 15px;
+            flex-direction: column; /* Выстраиваем ряды вертикально */
+            padding: 10px 15px;
             background: #1c1c1e;
             position: fixed;
             top: 0;
@@ -35,27 +35,39 @@
             z-index: 10;
         }
 
+        /* Контейнер для рядов кнопок */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 8px; /* Отступ между рядами */
+        }
+
+        /* Стили для второго ряда (кнопки 1-5) */
+        .header-row.second-row {
+            justify-content: center; /* Центрируем кнопки 1-5 */
+            gap: 8px; /* Расстояние между кнопками */
+            margin-top: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333; /* Разделительная линия */
+        }
+
         /* Стили для кнопок в шапке */
         .header-button {
             background: #060c1b;
             border: none;
             color: #fff;
-            padding: 6px 18px;
+            padding: 6px 12px;
             border-radius: 16px;
             font-size: 12px;
             cursor: pointer;
-        }
-
-        /* Стили для новых кнопок в шапке */
-        .header-button.new-button {
-            background: #4CAF50;
-            margin-left: 6px;
+            white-space: nowrap; /* Чтобы текст не переносился */
         }
 
         /* Стили для основного калькулятора */
         .calculator {
             position: fixed;
-            top: 60px;
+            top: 110px; /* Увеличил отступ, так как шапка стала выше */
             bottom: 0;
             left: 0;
             right: 0;
@@ -159,21 +171,24 @@
 <body>
     <!-- Шапка с кнопками -->
     <div class="header">
-    <button class="header-button" onclick="showCalculator()">домой</button>
-    <button class="header-button" onclick="window.location.href='virus/Kall_Energia.html'">Энер</button>
-    <button class="header-button" onclick="window.location.href='Kalls.html'">Акум</button>
-    <button class="header-button" onclick="window.location.href='PT100.html'">pt100</button>
-    <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">V=I⋅R</button>
-        <div class="header-buttons-row">
-  <button class="header-button" onclick="showCalculator()">1</button>
-  <button class="header-button" onclick="window.location.href='virus/Kall_Energia.html'">2</button>
-</div>
-<div class="header-buttons-row">
-  <button class="header-button" onclick="window.location.href='Kalls.html'">3</button>
-  <button class="header-button" onclick="window.location.href='PT100.html'">4</button>
-  <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">5</button>
-</div>
+        <!-- Первый ряд: основные функции -->
+        <div class="header-row">
+            <button class="header-button" onclick="showCalculator()">домой</button>
+            <button class="header-button" onclick="window.location.href='virus/Kall_Energia.html'">Энер</button>
+            <button class="header-button" onclick="window.location.href='Kalls.html'">Акум</button>
+            <button class="header-button" onclick="window.location.href='PT100.html'">pt100</button>
+            <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">V=I⋅R</button>
+        </div>
 
+        <!-- Второй ряд: кнопки 1-5 -->
+        <div class="header-row second-row">
+            <button class="header-button" onclick="showCalculator()">1</button>
+            <button class="header-button" onclick="window.location.href='virus/Kall_Energia.html'">2</button>
+            <button class="header-button" onclick="window.location.href='Kalls.html'">3</button>
+            <button class="header-button" onclick="window.location.href='PT100.html'">4</button>
+            <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">5</button>
+        </div>
+    </div>
     
     <!-- Основной калькулятор -->
     <div class="calculator" id="standardCalculator">
@@ -276,7 +291,11 @@
             updateDisplay();
         }
 
-       
+        // Заглушка для функции showCalculator, если она нужна
+        function showCalculator() {
+            // Здесь можно добавить логику, если нужно
+            console.log("Нажата кнопка домой/1");
+        }
      </script>
 </body>
 </html>
