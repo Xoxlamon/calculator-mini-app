@@ -184,16 +184,18 @@
         /* small fixed back button in top-left */
         .back-button {
             position: fixed;
-            top: 10px;
-            left: 10px;
-            padding: 4px 6px;
-            font-size: 14px;
+            top: 8px;
+            left: 8px;
+            padding: 2px 4px;
+            font-size: 12px;
+            line-height: 1;
             background-color: var(--button-clear);
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             z-index: 10000;
+            min-width: 0;
         }
         .back-button:hover {
             background-color: var(--button-hover-clear);
@@ -336,7 +338,13 @@
         }
 
         function goBack() {
-            history.back();
+            // use global window.history in case local `history` array exists
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // fallback: navigate to root or previous page manually
+                window.location.href = './';
+            }
         }
     </script>
 </body>
