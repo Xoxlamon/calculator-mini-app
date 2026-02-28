@@ -2,105 +2,447 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расчет пени</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Калькулятор электроэнергии</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-width: 400px;
-        }
-        h1 {
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-        button {
-            margin-top: 15px;
-            padding: 10px;
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .back-button {
-            background-color: #f44336;
-            margin-top: 10px;
-        }
-        .back-button:hover {
-            background-color: #d32f2f;
+        /* Базовые сбросы и настройки */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        /* small fixed back button in top-left corner */
-         .header-button {
-    background: #082667;
-    border: none;
-    color: #fff;
-    padding: 6px 18px;
-    border-radius: 16px;
-    font-size: 12px;
-    cursor: pointer;
-}
-        .back-button:hover {
-            background-color: var(--button-hover-clear);
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f7e6ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        /* Карточка калькулятора */
+        .calculator {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 12px auto;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .calculator:active {
+            transform: scale(0.998);
+        }
+
+        .calculator h1 {
+            color: #8b5cf6;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Поля ввода */
+        .calculator label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #64748b;
+            text-align: left;
+            padding-left: 4px;
+            font-weight: 500;
+        }
+
+        .calculator input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 4px 0 8px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px; /* Предотвращает зум на iOS */
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #f8fafc;
+            -moz-appearance: textfield;
+        }
+
+        .calculator input::-webkit-outer-spin-button,
+        .calculator input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .calculator input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+            background-color: #fff;
+        }
+
+        .calculator input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* Кнопки */
+        .calculator button {
+            background-color: #6366f1;
+            color: white;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 8px 4px;
+            min-height: 48px; /* Touch target */
+            min-width: 48px;
+            width: calc(50% - 8px);
+            transition: background-color 0.2s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .calculator button:active {
+            transform: scale(0.98);
+        }
+
+        .calculator button:hover {
+            background-color: #4f46e5;
+        }
+
+        .calculator button:focus-visible {
+            outline: 3px solid #8b5cf6;
+            outline-offset: 2px;
+        }
+
+        .clear-button {
+            background-color: #ef4444;
+        }
+
+        .clear-button:hover {
+            background-color: #dc2626;
+        }
+
+        /* Результат */
+        .result {
+            margin-top: 24px;
+            font-size: 18px;
+            color: #16a34a;
+            font-weight: 600;
+            padding: 16px;
+            background-color: #f0fdf4;
+            border-radius: 12px;
+            border: 1px solid #bbf7d0;
+            min-height: 24px;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        .result.error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        /* Разделитель между калькуляторами */
+        .divider {
+            width: 100%;
+            max-width: 400px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #cbd5e1, transparent);
+            margin: 8px auto;
+        }
+
+        /* === МЕДИА-ЗАПРОСЫ === */
+        
+        /* Планшеты и большие телефоны */
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                padding: 24px;
+                gap: 20px;
+            }
+            
+            .calculator {
+                margin: 0;
+            }
+            
+            .divider {
+                display: none;
+            }
+        }
+
+        /* Маленькие телефоны */
+        @media (max-width: 360px) {
+            body {
+                padding: 12px;
+            }
+            
+            .calculator {
+                padding: 16px;
+                border-radius: 14px;
+            }
+            
+            .calculator h1 {
+                font-size: 1.3rem;
+            }
+            
+            .calculator input,
+            .calculator button {
+                padding: 12px 14px;
+                font-size: 16px;
+            }
+            
+            .result {
+                font-size: 16px;
+                padding: 14px;
+            }
+        }
+
+        /* Тёмная тема (авто-определение) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1e1b4b;
+            }
+            
+            .calculator {
+                background-color: #2d2a4a;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            .calculator h1 {
+                color: #a78bfa;
+            }
+            
+            .calculator label {
+                color: #cbd5e1;
+            }
+            
+            .calculator input {
+                background-color: #373355;
+                border-color: #4b5563;
+                color: #f1f5f9;
+            }
+            
+            .calculator input:focus {
+                background-color: #3f3b60;
+            }
+            
+            .calculator input::placeholder {
+                color: #64748b;
+            }
+            
+            .result {
+                background-color: #166534;
+                border-color: #15803d;
+                color: #86efac;
+            }
+            
+            .result.error {
+                background-color: #991b1b;
+                border-color: #b91c1c;
+                color: #fecaca;
+            }
+        }
+
+        /* Анимация появления */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calculator {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .calculator:nth-child(2) {
+            animation-delay: 0.1s;
         }
     </style>
 </head>
 <body>
-    <!-- маленькая кнопка назад в углу -->
-    <button class="fixed-back" onclick="goBack()">← Назад</button>
+    <!-- Калькулятор 1: по показаниям -->
+    <div class="calculator">
+        <h1>🔌 По показаниям</h1>
+        
+        <label for="previousReading">Предыдущие показания:</label>
+        <input type="number" id="previousReading" placeholder="Например: 1250" inputmode="decimal" required>
+        
+        <label for="currentReading">Текущие показания:</label>
+        <input type="number" id="currentReading" placeholder="Например: 1380" inputmode="decimal" required>
+        
+        <label for="tariff1">Тариф за кВт⋅ч:</label>
+        <input type="number" id="tariff1" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal">
+        
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
+            <button type="button" onclick="calculateElectricity1()">💡 Рассчитать</button>
+            <button type="button" class="clear-button" onclick="clearFields1()">🗑️ Стереть</button>
+        </div>
+        
+        <div class="result" id="result1" role="status" aria-live="polite"></div>
+    </div>
 
-<h1>Расчет пени за неуплату</h1>
-<p>Введите сумму задолженности, ключевую ставку и количество дней просрочки для расчета пени.</p>
+    <div class="divider"></div>
 
-<label for="debt">Сумма задолженности (руб.):</label>
-<input type="number" id="debt" placeholder="Введите сумму" required>
+    <!-- Калькулятор 2: по кВт⋅ч -->
+    <div class="calculator">
+        <h1>⚡ По кВт⋅ч</h1>
+        
+        <label for="consumption">Количество кВт⋅ч:</label>
+        <input type="number" id="consumption" placeholder="Например: 130" inputmode="decimal" required>
+        
+        <label for="tariff2">Тариф за кВт⋅ч:</label>
+        <input type="number" id="tariff2" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal">
+        
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
+            <button type="button" onclick="calculateElectricity2()">💡 Рассчитать</button>
+            <button type="button" class="clear-button" onclick="clearFields2()">🗑️ Стереть</button>
+        </div>
+        
+        <div class="result" id="result2" role="status" aria-live="polite"></div>
+    </div>
 
-<label for="rate">Ключевая ставка (%):</label>
-<input type="number" id="rate" value="21" required>
+    <script>
+        // Вспомогательная функция для показа результата
+        function showResult(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'result' + (isError ? ' error' : '');
+        }
 
-<label for="days">Количество дней просрочки:</label>
-<input type="number" id="days" placeholder="Введите количество дней" required>
+        // Вспомогательная функция для плавной прокрутки
+        function scrollToResult(elementId) {
+            setTimeout(() => {
+                const el = document.getElementById(elementId);
+                el.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+            }, 150);
+        }
 
-<button onclick="calculatePenalty()">Рассчитать пеню</button>
-<button class="back-button" onclick="goBack()">Вернуться назад</button>
+        // Калькулятор 1: по показаниям
+        function calculateElectricity1() {
+            const previousInput = document.getElementById('previousReading');
+            const currentInput = document.getElementById('currentReading');
+            const tariffInput = document.getElementById('tariff1');
+            
+            const previous = parseFloat(previousInput.value);
+            const current = parseFloat(currentInput.value);
+            const tariff = parseFloat(tariffInput.value) || 1.58;
 
-<div class="result" id="result"></div>
+            // Валидация
+            if (!previousInput.value || !currentInput.value) {
+                showResult('result1', '⚠️ Заполните оба поля показаний', true);
+                scrollToResult('result1');
+                return;
+            }
 
-<script>
-    function calculatePenalty() {
-        const debt = parseFloat(document.getElementById('debt').value);
-        const rate = parseFloat(document.getElementById('rate').value) / 100; // Преобразуем в доли
-        const days = parseInt(document.getElementById('days').value);
+            if (isNaN(previous) || isNaN(current) || isNaN(tariff)) {
+                showResult('result1', '❌ Введите корректные числа', true);
+                scrollToResult('result1');
+                return;
+            }
 
-        const penalty = debt * rate * (1 / 300) * days;
+            if (current < previous) {
+                showResult('result1', '❌ Текущие показания не могут быть меньше предыдущих!', true);
+                scrollToResult('result1');
+                return;
+            }
 
-        document.getElementById('result').innerText = 'Пеня составляет: ' + penalty.toFixed(2) + ' рублей';
-    }
+            const consumption = current - previous;
+            const cost = consumption * tariff;
+            
+            showResult('result1', `📊 Расход: ${consumption.toFixed(2)} кВт⋅ч\n💰 Стоимость: ${cost.toFixed(2)} ₽`);
+            scrollToResult('result1');
+            
+            // Вибрация при успехе (если поддерживается)
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
 
-    function goBack() {
-        window.history.back();
-    }
-</script>
+        // Очистка полей для калькулятора 1
+        function clearFields1() {
+            document.getElementById('previousReading').value = '';
+            document.getElementById('currentReading').value = '';
+            document.getElementById('tariff1').value = '1.58';
+            document.getElementById('result1').textContent = '';
+            document.getElementById('result1').className = 'result';
+            document.getElementById('previousReading').focus();
+        }
 
+        // Калькулятор 2: по кВт⋅ч
+        function calculateElectricity2() {
+            const consumptionInput = document.getElementById('consumption');
+            const tariffInput = document.getElementById('tariff2');
+            
+            const consumption = parseFloat(consumptionInput.value);
+            const tariff = parseFloat(tariffInput.value) || 1.58;
+
+            if (!consumptionInput.value) {
+                showResult('result2', '⚠️ Введите количество кВт⋅ч', true);
+                scrollToResult('result2');
+                return;
+            }
+
+            if (isNaN(consumption) || isNaN(tariff)) {
+                showResult('result2', '❌ Введите корректные числа', true);
+                scrollToResult('result2');
+                return;
+            }
+
+            if (consumption <= 0) {
+                showResult('result2', '❌ Значение должно быть больше 0', true);
+                scrollToResult('result2');
+                return;
+            }
+
+            const cost = consumption * tariff;
+            showResult('result2', `💰 Стоимость: ${cost.toFixed(2)} ₽`);
+            scrollToResult('result2');
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        // Очистка полей для калькулятора 2
+        function clearFields2() {
+            document.getElementById('consumption').value = '';
+            document.getElementById('tariff2').value = '1.58';
+            document.getElementById('result2').textContent = '';
+            document.getElementById('result2').className = 'result';
+            document.getElementById('consumption').focus();
+        }
+
+        // Обработка нажатия Enter в полях ввода
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const calcId = this.closest('.calculator').querySelector('.result').id;
+                    if (calcId === 'result1') calculateElectricity1();
+                    else calculateElectricity2();
+                }
+            });
+        });
+
+        // Предотвращение "дёрганья" страницы при pull-to-refresh на мобильных
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                e.stopPropagation();
+            }
+        }, { passive: true });
+    </script>
 </body>
 </html>
