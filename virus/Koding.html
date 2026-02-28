@@ -49,9 +49,29 @@
         .back-button:hover {
             background-color: #d32f2f;
         }
+
+        /* small fixed back button in top-left corner */
+        .fixed-back {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            padding: 2px 4px;
+            font-size: 12px;
+            background-color: #555;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .fixed-back:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 <body>
+    <!-- маленькая кнопка назад в углу -->
+    <button class="fixed-back" onclick="goBack()">← Назад</button>
 
 <h1>Расчет пени за неуплату</h1>
 <p>Введите сумму задолженности, ключевую ставку и количество дней просрочки для расчета пени.</p>
