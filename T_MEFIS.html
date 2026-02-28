@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор Тока МЭФИС</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .slider-container {
+            margin-top: 15px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e1e5e9;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-unit {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .specification {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .result-value {
+                font-size: 28px;
+            }
+            
+            .tab {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h1>Калькулятор тока МЭФИС</h1>
+            <p>100% = 600 мА</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="percentage-to-current">% → Ток</button>
+            <button class="tab" data-tab="current-to-percentage">Ток → %</button>
+        </div>
+
+        <!-- Процент → Ток -->
+        <div class="tab-content active" id="percentage-to-current">
+            <div class="input-group">
+                <label for="percentage">Процентное значение:</label>
+                <input 
+                    type="number" 
+                    id="percentage" 
+                    class="input-field" 
+                    min="0" 
+                    max="100" 
+                    value="50"
+                    placeholder="Введите процент от 0 до 100"
+                >
+                <div class="slider-container">
+                    <input 
+                        type="range" 
+                        id="percentageSlider" 
+                        class="slider" 
+                        min="0" 
+                        max="100" 
+                        value="50"
+                    >
+                </div>
+            </div>
+
+            <div class="result">
+                <div class="result-label">Ток:</div>
+                <div class="result-value" id="currentValue">300.0</div>
+                <div class="result-unit">миллиампер (мА)</div>
+            </div>
+        </div>
+
+        <!-- Ток → Процент -->
+        <div class="tab-content" id="current-to-percentage">
+            <div class="input-group">
+                <label for="current">Значение тока:</label>
+                <input 
+                    type="number" 
+                    id="current" 
+                    class="input-field" 
+                    min="0" 
+                    max="600" 
+                    value="300"
+                    placeholder="Введите ток от 0 до 600 мА"
+                    step="0.1"
+                >
+                <div class="slider-container">
+                    <input 
+                        type="range" 
+                        id="currentSlider" 
+                        class="slider" 
+                        min="0" 
+                        max="600" 
+                        value="300"
+                        step="1"
+                    >
+                </div>
+            </div>
+
+            <div class="result">
+                <div class="result-label">Процент:</div>
+                <div class="result-value" id="percentageValue">50.0</div>
+                <div class="result-unit">процент (%)</div>
+            </div>
+        </div>
+
+        <div class="specification">
+            <div>Формулы:</div>
+            <div>Ток = (Процент × 600 мА) ÷ 100</div>
+            <div>Процент = (Ток × 100) ÷ 600 мА</div>
+        </div>
+    </div>
+
+    <script>
+        // Элементы для вкладки "Процент → Ток"
+        const percentageInput = document.getElementById('percentage');
+        const percentageSlider = document.getElementById('percentageSlider');
+        const currentValue = document.getElementById('currentValue');
+
+        // Элементы для вкладки "Ток → Процент"
+        const currentInput = document.getElementById('current');
+        const currentSlider = document.getElementById('currentSlider');
+        const percentageValue = document.getElementById('percentageValue');
+
+        // Элементы вкладок
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Функции расчета
+        function calculateCurrent(percentage) {
+            return (percentage * 600) / 100;
+        }
+
+        function calculatePercentage(current) {
+            return (current * 100) / 600;
+        }
+
+        // Обновление результатов для вкладки "Процент → Ток"
+        function updateCurrentResult(percentage) {
+            const current = calculateCurrent(percentage);
+            currentValue.textContent = current.toFixed(1);
+        }
+
+        // Обновление результатов для вкладки "Ток → Процент"
+        function updatePercentageResult(current) {
+            const percentage = calculatePercentage(current);
+            percentageValue.textContent = percentage.toFixed(1);
+        }
+
+        // Синхронизация элементов для вкладки "Процент → Ток"
+        function syncPercentageInputs(value) {
+            const percentage = Math.min(100, Math.max(0, parseFloat(value) || 0));
+            percentageInput.value = percentage;
+            percentageSlider.value = percentage;
+            updateCurrentResult(percentage);
+        }
+
+        // Синхронизация элементов для вкладки "Ток → Процент"
+        function syncCurrentInputs(value) {
+            const current = Math.min(600, Math.max(0, parseFloat(value) || 0));
+            currentInput.value = current;
+            currentSlider.value = current;
+            updatePercentageResult(current);
+        }
+
+        // Обработчики для вкладки "Процент → Ток"
+        percentageInput.addEventListener('input', function() {
+            syncPercentageInputs(this.value);
+        });
+
+        percentageSlider.addEventListener('input', function() {
+            syncPercentageInputs(this.value);
+        });
+
+        // Обработчики для вкладки "Ток → Процент"
+        currentInput.addEventListener('input', function() {
+            syncCurrentInputs(this.value);
+        });
+
+        currentSlider.addEventListener('input', function() {
+            syncCurrentInputs(this.value);
+        });
+
+        // Переключение вкладок
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Убираем активный класс у всех вкладок и контента
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Добавляем активный класс текущей вкладке и контенту
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Инициализация
+        updateCurrentResult(50);
+        updatePercentageResult(300);
+    </script>
+</body>
+</html>
