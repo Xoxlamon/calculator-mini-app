@@ -30,6 +30,37 @@
             line-height: 1.5;
         }
 
+        /* === Кнопка "Назад" === */
+        .header {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 8px;
+            display: flex;
+            justify-content: flex-start;
+            padding: 0 4px;
+        }
+
+        .header-button {
+            background: #082667;
+            border: none;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .header-button:hover {
+            opacity: 0.8;
+        }
+
+        .header-button:focus-visible {
+            outline: 3px solid #8b5cf6;
+            outline-offset: 2px;
+        }
+
         /* Карточка калькулятора */
         .calculator {
             background-color: #ffffff;
@@ -72,7 +103,7 @@
             margin: 4px 0 8px 0;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 16px; /* Предотвращает зум на iOS */
+            font-size: 16px;
             transition: border-color 0.2s, box-shadow 0.2s;
             background-color: #f8fafc;
             -moz-appearance: textfield;
@@ -106,7 +137,7 @@
             font-size: 16px;
             font-weight: 500;
             margin: 8px 4px;
-            min-height: 48px; /* Touch target */
+            min-height: 48px;
             min-width: 48px;
             width: calc(50% - 8px);
             transition: background-color 0.2s, transform 0.1s;
@@ -268,12 +299,21 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        .calculator:nth-child(2) {
+        .calculator:first-of-type {
+            animation-delay: 0s;
+        }
+        
+        .calculator:last-of-type {
             animation-delay: 0.1s;
         }
-        .header-button {         background: #082667;         border: none;         color: #fff;         padding: 6px 18px;         border-radius: 16px;         font-size: 12px;         cursor: pointer;     }     .header-button:hover {         opacity: 0.8;     }     </style>
+    </style>
 </head>
-<body>     <!-- кнопка назад -->     <div class="header">         <button class="header-button" onclick="window.location.href='../index.html'">Назад</button>     </div>
+<body>
+    <!-- Кнопка назад -->
+    <div class="header">
+        <button class="header-button" onclick="window.location.href='../index.html'" aria-label="Вернуться на главную страницу">← Назад</button>
+    </div>
+
     <!-- Калькулятор 1: по показаниям -->
     <div class="calculator">
         <h1>🔌 По показаниям</h1>
@@ -285,11 +325,12 @@
         <input type="number" id="currentReading" placeholder="Например: 1380" inputmode="decimal" required>
         
         <label for="tariff1">Тариф за кВт⋅ч:</label>
-        <input type="number" id="tariff1" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal">
+        <input type="number" id="tariff1" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal" aria-describedby="tariffHint1">
+        <small id="tariffHint1" style="display:block; color:#94a3b8; font-size:12px; margin:-4px 0 8px 4px; text-align:left;">₽ за киловатт-час</small>
         
         <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
-            <button type="button" onclick="calculateElectricity1()">💡 Рассчитать</button>
-            <button type="button" class="clear-button" onclick="clearFields1()">🗑️ Стереть</button>
+            <button type="button" onclick="calculateElectricity1()" aria-label="Рассчитать стоимость по показаниям счётчика">💡 Рассчитать</button>
+            <button type="button" class="clear-button" onclick="clearFields1()" aria-label="Очистить поля калькулятора">🗑️ Стереть</button>
         </div>
         
         <div class="result" id="result1" role="status" aria-live="polite"></div>
@@ -305,11 +346,12 @@
         <input type="number" id="consumption" placeholder="Например: 130" inputmode="decimal" required>
         
         <label for="tariff2">Тариф за кВт⋅ч:</label>
-        <input type="number" id="tariff2" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal">
+        <input type="number" id="tariff2" placeholder="1.58" value="1.58" step="0.01" inputmode="decimal" aria-describedby="tariffHint2">
+        <small id="tariffHint2" style="display:block; color:#94a3b8; font-size:12px; margin:-4px 0 8px 4px; text-align:left;">₽ за киловатт-час</small>
         
         <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
-            <button type="button" onclick="calculateElectricity2()">💡 Рассчитать</button>
-            <button type="button" class="clear-button" onclick="clearFields2()">🗑️ Стереть</button>
+            <button type="button" onclick="calculateElectricity2()" aria-label="Рассчитать стоимость по количеству кВт⋅ч">💡 Рассчитать</button>
+            <button type="button" class="clear-button" onclick="clearFields2()" aria-label="Очистить поля калькулятора">🗑️ Стереть</button>
         </div>
         
         <div class="result" id="result2" role="status" aria-live="polite"></div>
@@ -370,7 +412,7 @@
             scrollToResult('result1');
             
             // Вибрация при успехе (если поддерживается)
-            if (navigator.vibrate) navigator.vibrate(50);
+            if ('vibrate' in navigator) navigator.vibrate(50);
         }
 
         // Очистка полей для калькулятора 1
@@ -413,7 +455,7 @@
             showResult('result2', `💰 Стоимость: ${cost.toFixed(2)} ₽`);
             scrollToResult('result2');
             
-            if (navigator.vibrate) navigator.vibrate(50);
+            if ('vibrate' in navigator) navigator.vibrate(50);
         }
 
         // Очистка полей для калькулятора 2
@@ -437,12 +479,10 @@
             });
         });
 
-        // Предотвращение "дёрганья" страницы при pull-to-refresh на мобильных
-        document.addEventListener('touchmove', function(e) {
-            if (e.target.tagName === 'INPUT') {
-                e.stopPropagation();
-            }
-        }, { passive: true });
+        // Мягкая обработка touch-событий (не ломает скролл)
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
