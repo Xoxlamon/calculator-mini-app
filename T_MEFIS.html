@@ -195,9 +195,25 @@
                 font-size: 13px;
             }
         }
+           .header-button {
+    background: #082667;
+    border: none;
+    color: #fff;
+    padding: 6px 18px;
+    border-radius: 16px;
+    font-size: 12px;
+    cursor: pointer;
+}
+        .back-button:hover {
+            background-color: var(--button-hover-clear);
+        }
     </style>
 </head>
 <body>
+      <!-- кнопка назад -->
+   <div class="header">
+        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
+    </div>
     <div class="calculator">
         <div class="header">
             <h1>Калькулятор тока МЭФИС</h1>
