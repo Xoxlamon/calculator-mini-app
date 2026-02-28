@@ -1,924 +1,622 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ПСУ-2</title>
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <style>
-        :root {
-            --primary: #007bff;
-            --primary-dark: #0056b3;
-            --success: #28a745;
-            --success-dark: #218838;
-            --zone-6: #4CAF50;
-            --zone-6-dark: #45a049;
-            --zone-36: #2196F3;
-            --zone-36-dark: #1976D2;
-            --gray: #666;
-            --gray-light: #f8f9fa;
-            --border: #ddd;
-            --shadow: rgba(0,0,0,0.15);
-            --shadow-hover: rgba(0,0,0,0.25);
-        }
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>    
+<meta charset="UTF-8">
+<title>ПСУ-2</title>
+<style>
+/* 🔄 Кнопка "Назад" - верхний левый угол */
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: #666;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 60px;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            margin: 0;
-            padding: 10px;
-            padding-top: 80px;
-            padding-bottom: 20px;
-            line-height: 1.4;
-            background: #fff;
-            color: #333;
-        }
+.back-btn:hover {
+    background: #555;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
 
-        /* 🔙 Кнопка "Назад" */
-        .back-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1001;
-            background: var(--gray);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px var(--shadow);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .back-btn:hover {
-            background: #555;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px var(--shadow-hover);
-        }
+.back-btn:active {
+    transform: translateY(0);
+}
 
-        /* 📡 Статус MQTT */
-        .mqtt-status {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1001;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px var(--shadow);
-            transition: all 0.3s ease;
-        }
-        .mqtt-status::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #dc3545;
-            animation: pulse 2s infinite;
-        }
-        .mqtt-status.connected::before {
-            background: var(--success);
-            animation: none;
-        }
-        .mqtt-status.connecting::before {
-            background: #ffc107;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(0.9); }
-        }
+.nav-container {
+    position: fixed;         
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
 
-        /* 🍔 Выпадающее меню */
-        .nav-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
+.menu-toggle {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 60px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    display: block;
+}
 
-        .menu-toggle {
-            background: var(--gray);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            min-height: 44px;
-            box-shadow: 0 4px 12px var(--shadow);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+.menu-toggle:hover {
+    background: #555;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
 
-        .menu-toggle:hover {
-            background: #555;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--shadow-hover);
-        }
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 220px;
+    z-index: 999;
+    overflow: hidden;
+}
 
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 8px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 220px;
-            z-index: 999;
-            overflow: hidden;
-        }
+.nav-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
 
-        .nav-container:hover .dropdown-menu,
-        .nav-container:focus-within .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: #333;
+}
 
-        .dropdown-item {
-            display: block;
-            width: 100%;
-            padding: 14px 20px;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            font-size: 15px;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid #f0f0f0;
-            text-decoration: none;
-            color: #333;
-        }
+.dropdown-item:last-child {
+    border-bottom: none;
+}
 
-        .dropdown-item:last-child { border-bottom: none; }
-        .dropdown-item:hover {
-            background: var(--gray);
-            color: white;
-            padding-left: 24px;
-        }
+.update-btn {
+    text-decoration: none !important;
+}
 
-        /* 🔘 Кнопки шкафов */
-        .buttons-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: flex-start;
-            margin-bottom: 20px;
-            padding: 10px 5px;
-        }
+.dropdown-item:hover {
+    background: #666;
+    color: white;
+    padding-left: 24px;
+}
 
-        .cabinet-btn {
-            padding: 12px 8px;
-            border: 2px solid var(--border);
-            background: white;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            font-weight: 600;
-            min-width: 90px;
-            max-width: 110px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1 1 auto;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+#myFrame {
+    width: 100%;
+    border: none;
+    display: block;
+    margin: 0 auto;
+    border-radius: 20px;
+}
 
-        .cabinet-btn:hover {
-            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-            transform: translateY(-3px);
-        }
+* { box-sizing: border-box; }
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 10px; 
+    padding-bottom: 20px;
+    max-width: 100%;
+    line-height: 1.4;
+    padding-top: 100px; /* ⬆️ Увеличено с 10px до 100px — место под кнопки */
+}
 
-        .cabinet-btn.type-6_zone {
-            background: var(--zone-6);
-            color: white;
-            border-color: var(--zone-6-dark);
-        }
+/* 🎯 Контейнер кнопок — сдвинут вниз */
+.buttons-container {
+    display: flex; 
+    flex-direction: row;
+    gap: 8px; 
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    margin-top: 10px; /* ⬆️ Дополнительный отступ сверху */
+    flex-wrap: wrap;
+    padding: 10px;
+    max-width: 100%;
+    overflow: visible;
+}
 
-        .cabinet-btn.type-36_zone {
-            background: var(--zone-36);
-            color: white;
-            border-color: var(--zone-36-dark);
-        }
+.cabinet-btn {
+    padding: 12px 8px;
+    border: 2px solid #ddd; 
+    background: white;
+    text-align: center; 
+    cursor: pointer; 
+    border-radius: 8px; 
+    transition: all 0.3s;
+    font-size: 15px;
+    font-weight: bold;
+    min-width: 90px;
+    max-width: 110px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+}
 
-        .cabinet-btn.active {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
+.cabinet-btn:hover { 
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3); 
+    transform: translateY(-10px);
+}
 
-        .cabinet-btn.type-6_zone.active {
-            box-shadow: 
-                0 8px 24px rgba(76, 175, 80, 0.5),
-                0 0 0 3px rgba(76, 175, 80, 0.3);
-            border-color: var(--zone-6);
-        }
+.cabinet-btn.type-6_zone { 
+    background: #4CAF50; 
+    color: white; 
+    border-color: #45a049; 
+}
+.cabinet-btn.type-36_zone { 
+    background: #2196F3; 
+    color: white; 
+    border-color: #1976D2; 
+}
 
-        .cabinet-btn.type-36_zone.active {
-            box-shadow: 
-                0 8px 24px rgba(33, 150, 243, 0.5),
-                0 0 0 3px rgba(33, 150, 243, 0.3);
-            border-color: var(--zone-36);
-        }
+.cabinet-btn.type-6_zone.active { 
+    box-shadow:
+                0 8px 24px rgba(76, 175, 80, 0.6),
+                0 0 40px rgba(76, 225, 80, 0.4);
+    transform: translateY(-10px); 
+    border-color: 0 0 40px rgba(76, 175, 80, 0.6);
+}
 
-        /* 🖼️ Iframe */
-        #myFrame {
-            width: 100%;
-            border: none;
-            display: block;
-            margin: 0 auto;
-            border-radius: 20px;
-            min-height: 400px;
-            height: calc(100vh - 280px);
-            max-height: 1300px;
-            background: var(--gray-light);
-            transition: height 0.2s ease;
-        }
+.cabinet-btn.type-36_zone.active { 
+    box-shadow: 
+                0 8px 24px rgba(33, 150, 243, 0.6),
+                0 0 40px rgba(33, 200, 243, 0.4);
+    transform: translateY(-10px); 
+    border-color: 0 0 40px rgba(33, 150, 243, 0.6);                       
+}
 
-        /* 🪟 Модальное окно */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 10px;
-        }
+.change-btn {
+    background: #007bff; 
+    color: white; 
+    padding: 15px 25px; 
+    border: none;
+    border-radius: 8px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    display: block;
+    margin: 0 auto 20px;
+    touch-action: manipulation;
+    min-width: 200px;
+}
+.change-btn:hover, .change-btn:active { 
+    background: #0056b3; 
+}
 
-        .modal-content {
-            background: white;
-            margin: 20px auto;
-            padding: 0;
-            width: 100%;
-            max-width: 600px;
-            max-height: calc(100vh - 40px);
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-        }
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.7);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.modal-content { 
+    background: white; 
+    margin: 10px auto; 
+    padding: 0; 
+    width: calc(100% - 20px);
+    max-width: 600px; 
+    max-height: calc(100vh - 20px);
+    border-radius: 12px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.modal-header { 
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white; 
+    padding: 20px; 
+    border-radius: 12px 12px 0 0; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-title {
+    margin: 0;
+    font-size: 20px;
+    flex: 1;
+}
+.close { 
+    font-size: 28px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    padding: 5px;
+    line-height: 1;
+    touch-action: manipulation;
+}
+.close:hover, .close:active { 
+    opacity: 0.8; 
+    color: #ff4444;
+}
 
-        .modal-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 18px 24px;
-            border-radius: 16px 16px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
+.modal-body {
+    padding: 20px;
+    max-height: calc(80vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
-        .modal-title {
-            margin: 0;
-            font-size: 19px;
-            font-weight: 600;
-        }
+/* Компактные настройки */
+.cabinet-settings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+@media (max-width: 480px) {
+    .cabinet-settings {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+    }
+}
 
-        .close {
-            font-size: 32px;
-            font-weight: 300;
-            cursor: pointer;
-            padding: 4px 8px;
-            line-height: 1;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
+.cabinet-setting {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.setting-name { 
+    font-weight: bold; 
+    font-size: 14px; 
+    margin-bottom: 12px; 
+    color: #333;
+    text-align: center;
+    padding: 8px 0;
+    background: rgba(0,123,255,0.05);
+    border-radius: 4px;
+}
 
-        .close:hover {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
+.form-row { 
+    display: flex; 
+    flex-direction: column;
+    gap: 4px; 
+    margin-bottom: 10px;
+}
+@media (min-width: 500px) {
+    .form-row { 
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+    .form-row label {
+        min-width: 45px;
+        font-size: 13px;
+    }
+}
 
-        .modal-body {
-            padding: 20px 24px;
-            overflow-y: auto;
-            flex: 1;
-        }
+label { 
+    font-weight: 600; 
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
 
-        /* ⚙️ Настройки шкафов */
-        .cabinet-settings {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
+input[type="text"], select { 
+    padding: 8px 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 6px; 
+    font-size: 14px;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+input[type="text"]:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+}
 
-        .cabinet-setting {
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 12px;
-            background: var(--gray-light);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            transition: box-shadow 0.2s ease;
-        }
+.show-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.show-row label {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 13px;
+}
+input[type="checkbox"] { 
+    transform: scale(1.3); 
+    margin: 0;
+    accent-color: #28a745;
+    width: 18px;
+    height: 18px;
+}
 
-        .cabinet-setting:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        }
+.save-btn {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white; 
+    padding: 16px 24px; 
+    border: none;
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: bold;
+    width: 100%;
+    touch-action: manipulation;
+    box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+}
+.save-btn:hover, .save-btn:active { 
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-1px);
+}
 
-        .setting-name {
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 14px;
-            color: #333;
-            text-align: center;
-            padding: 10px;
-            background: rgba(0,123,255,0.08);
-            border-radius: 8px;
-        }
+.form-input { background-color: #fff; }
 
-        .form-row {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        @media (min-width: 480px) {
-            .form-row {
-                flex-direction: row;
-                align-items: center;
-                gap: 10px;
-            }
-            .form-row label {
-                min-width: 55px;
-                font-size: 14px;
-            }
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 14px;
-            color: #555;
-            margin: 0;
-        }
-
-        input[type="text"],
-        select {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            width: 100%;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input[type="text"]:focus,
-        select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
-        }
-
-        .show-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed var(--border);
-        }
-
-        .show-row label {
-            margin: 0;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            transform: scale(1.4);
-            margin: 0;
-            accent-color: var(--success);
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .save-btn {
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
-            color: white;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(40,167,69,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .save-btn:hover {
-            background: linear-gradient(135deg, var(--success-dark), #1e7e34);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
-        }
-
-        .save-btn:active {
-            transform: translateY(0);
-        }
-
-        /* 📱 Адаптив */
-        @media (max-width: 480px) {
-            body {
-                padding: 8px;
-                padding-top: 140px;
-            }
-
-            .back-btn,
-            .mqtt-status {
-                font-size: 14px;
-                padding: 8px 14px;
-            }
-
-            .menu-toggle {
-                padding: 10px 16px;
-                font-size: 15px;
-                min-height: 40px;
-            }
-
-            .dropdown-menu {
-                min-width: 200px;
-            }
-
-            .cabinet-btn {
-                min-width: 85px;
-                max-width: 100px;
-                font-size: 14px;
-                height: 56px;
-                padding: 10px 6px;
-            }
-
-            .modal-content {
-                margin: 10px auto;
-                border-radius: 14px;
-                max-height: calc(100vh - 20px);
-            }
-
-            .modal-header {
-                padding: 16px 20px;
-            }
-
-            .modal-title {
-                font-size: 18px;
-            }
-
-            .modal-body {
-                padding: 16px 20px;
-            }
-
-            .cabinet-settings {
-                grid-template-columns: 1fr;
-                gap: 14px;
-            }
-
-            .cabinet-setting {
-                padding: 14px;
-            }
-
-            #myFrame {
-                height: calc(100vh - 320px);
-                border-radius: 16px;
-            }
-        }
-
-        /* 🖱️ Улучшения для тач-устройств */
-        @media (hover: none) {
-            .cabinet-btn:hover {
-                transform: none;
-            }
-            .cabinet-btn:active {
-                transform: translateY(-2px);
-            }
-            .menu-toggle:active,
-            .save-btn:active {
-                transform: scale(0.98);
-            }
-        }
-
-        /* 🎨 Плавная прокрутка */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* 🔍 Скрытие скроллбара для чистоты */
-        .modal-body::-webkit-scrollbar,
-        body::-webkit-scrollbar {
-            width: 6px;
-        }
-        .modal-body::-webkit-scrollbar-track,
-        body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .modal-body::-webkit-scrollbar-thumb,
-        body::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 3px;
-        }
-        .modal-body::-webkit-scrollbar-thumb:hover,
-        body::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.35);
-        }
-    </style>
+/* Адаптив для мобильных */
+@media (max-width: 480px) {
+    body { 
+        margin: 5px; 
+        padding-top: 110px; /* ⬆️ Увеличено для мобильных */
+    }
+    .back-btn {
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        min-height: 50px;
+        min-width: 50px;
+        font-size: 14px;
+    }
+    .nav-container {
+        top: 10px;
+        right: 10px;
+    }
+    .menu-toggle {
+        padding: 10px 16px;
+        min-height: 50px;
+        font-size: 14px;
+    }
+    .cabinet-btn { 
+        min-width: 85px; 
+        max-width: 100px;
+        font-size: 13px; 
+        height: 55px;
+        padding: 10px 6px;
+    }
+    .modal-content { margin: 5px auto; width: calc(100% - 10px); }
+    .modal-body { padding: 15px; }
+    .cabinet-setting { padding: 12px; }
+    .setting-name { font-size: 13px; padding: 6px 0; }
+}
+</style>
 </head>
 <body>
 
-    <!-- 🔙 Кнопка "Назад" (одна) -->
-    <button class="back-btn" onclick="location.href='https://xoxlamon.github.io/calculator-mini-app/'">
-        <span>&#8592;</span> Назад
-    </button>
+<!-- 🔙 Кнопка "Назад" -->
+<button class="back-btn" onclick="goBack()" title="Назад">←</button>
 
-    <!-- 📡 Статус MQTT -->
-    <div id="mqttStatus" class="mqtt-status connecting">Подключение...</div>
+<div class="nav-container">
+    <button class="menu-toggle">☰ Меню</button>
+    <div class="dropdown-menu">
+        <button class="dropdown-item nav-button" onclick="loadContent('/terminal', this)">Терминал</button>
+        <button class="dropdown-item nav-button" onclick="openSettingsModal()">Изменить шкафы</button>
+        <a class="dropdown-item nav-button" href="/update">Обновить прошивку</a>
+    </div>
+</div>
 
-    <!-- 🍔 Меню -->
-    <div class="nav-container">
-        <button class="menu-toggle" tabindex="0">
-            <span>☰</span> Меню
-        </button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item nav-button" onclick="loadContent('/terminal', this)">Терминал</button>
-            <button class="dropdown-item nav-button" onclick="openSettingsModal()">Изменить шкафы</button>
-            <a class="dropdown-item nav-button" href="/update">Обновить прошивку</a>
+<div id="buttonsContainer" class="buttons-container"></div>
+
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title">Настройки шкафов</h1>
+            <span class="close" onclick="closeSettingsModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="cabinetSettings" class="cabinet-settings"></div>
+            <button class="save-btn" onclick="saveAllChanges()">💾 Сохранить в LittleFS</button>
         </div>
     </div>
+</div>
 
-    <!-- 🔘 Контейнер кнопок -->
-    <div id="buttonsContainer" class="buttons-container"></div>
+<iframe id="myFrame" src="" width="100%" height="1300px">
+    <p>Ваш браузер не поддерживает iframe.</p>
+</iframe>
 
-    <!-- 🪟 Модальное окно настроек -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title">⚙️ Настройки шкафов</h1>
-                <span class="close" onclick="closeSettingsModal()" aria-label="Закрыть">&times;</span>
+<script>
+// 🔙 Функция "Назад"
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Если истории нет — перезагружаем главную
+        window.location.href = '/';
+    }
+}
+
+// MQTT настройки
+const mqttHost = 'wss://m1.wqtt.ru:19157';
+const options = {
+    connectTimeout: 15000,
+    keepalive: 60,
+    reconnectPeriod: 3000,
+    clientId: 'WebClient_' + Date.now(),
+    username: 'u_LQAPTV',
+    password: 'bC4joft7',
+    protocolVersion: 4,
+    rejectUnauthorized: false
+};
+
+const client = mqtt.connect(mqttHost, options);
+let outTopic = 'ST8';
+
+client.on('connect', function() {
+    client.subscribe(outTopic, { qos: 1 });
+});
+
+client.on('message', function(topic, message) {
+    const msg = message.toString();
+    const iframe = document.getElementById('myFrame');
+    iframe.contentWindow.postMessage({ type: 'mqttMessage', topic: topic, payload: msg }, '*');
+});
+
+var st_data_json = '';
+
+function loadContent(url, button) {
+    const container = document.getElementById('buttonsContainer');
+    const allButtons = container.querySelectorAll('.cabinet-btn');
+    allButtons.forEach(button => button.classList.remove('active'));
+    button.classList.add('active');
+    const iframe = document.getElementById('myFrame');
+    iframe.src = url;
+}
+
+function newLoadContent(name, type) {
+    client.unsubscribe(outTopic);
+    outTopic = "PSU6/" + name;
+    client.subscribe(outTopic, { qos: 1 });
+    
+    let url = '';
+    if(type === "6_zone") url = 'st_6.html';
+    if(type === "36_zone") url = 'st_36.html';
+    
+    const stNumber = name.replace('ST', '');
+    const fullUrl = `${url}?st=${stNumber}`;
+    
+    const iframe = document.getElementById('myFrame');
+    iframe.src = fullUrl;
+}
+
+let jsonData = null, displayData = null;
+
+async function loadConfig() {
+    jsonData = {"cabinet":[{"name":"ST8","type":"6_zone","visible":true},{"name":"ST9","type":"6_zone","visible":true},{"name":"ST10","type":"36_zone","visible":true},{"name":"ST11","type":"36_zone","visible":true},{"name":"ST12","type":"36_zone","visible":true},{"name":"ST13","type":"6_zone","visible":true}]};
+    displayData = JSON.parse(JSON.stringify(jsonData));
+    displayCabinetButtons();
+}
+
+function displayCabinetButtons() {
+    const container = document.getElementById('buttonsContainer');
+    container.innerHTML = '';
+    displayData.cabinet.forEach(cabinet => {
+        if (cabinet.visible) {
+            const btn = document.createElement('div');
+            btn.className = `cabinet-btn type-${cabinet.type}`;
+            btn.textContent = cabinet.name;
+
+            btn.addEventListener('click', function() {
+                newLoadContent(cabinet.name, cabinet.type);
+                const allButtons = container.querySelectorAll('.cabinet-btn');
+                allButtons.forEach(button => button.classList.remove('active'));
+                btn.classList.toggle('active');
+            });
+            container.appendChild(btn);
+        }
+    });
+}
+
+function openSettingsModal() { 
+    if (jsonData) { 
+        renderSettingsForm(); 
+        document.getElementById('settingsModal').style.display = 'block'; 
+    } 
+}
+
+function closeSettingsModal() { 
+    document.getElementById('settingsModal').style.display = 'none'; 
+}
+
+function renderSettingsForm() {
+    const container = document.getElementById('cabinetSettings');
+    container.innerHTML = '';
+    jsonData.cabinet.forEach((cabinet, index) => {
+        const setting = document.createElement('div');
+        setting.className = 'cabinet-setting';
+        setting.dataset.index = index;
+        setting.innerHTML = `
+            <div class="setting-name">${cabinet.name}</div>
+            <div class="form-row">
+                <label>Name:</label>
+                <input type="text" class="form-input" value="${cabinet.name}">
             </div>
-            <div class="modal-body">
-                <div id="cabinetSettings" class="cabinet-settings"></div>
-                <button class="save-btn" onclick="saveAllChanges()">
-                    <span>💾</span> Сохранить в LittleFS
-                </button>
+            <div class="form-row">
+                <label>Тип:</label>
+                <select class="form-input">
+                    <option value="6_zone" ${cabinet.type === '6_zone' ? 'selected' : ''}>6 зон</option>
+                    <option value="36_zone" ${cabinet.type === '36_zone' ? 'selected' : ''}>36 зон</option>
+                </select>
             </div>
-        </div>
-    </div>
+            <div class="show-row">
+                <input type="checkbox" class="form-input" ${cabinet.visible ? 'checked' : ''}>
+                <label>Показать</label>
+            </div>
+        `;
+        container.appendChild(setting);
+    });
+}
 
-    <!-- 🖼️ Iframe для контента -->
-    <iframe id="myFrame" src="" title="Контент шкафа">
-        <p>Ваш браузер не поддерживает iframe.</p>
-    </iframe>
+async function saveAllChanges() {
+    const settings = document.querySelectorAll('.cabinet-setting');
+    settings.forEach(setting => {
+        const index = parseInt(setting.dataset.index);
+        const inputs = setting.querySelectorAll('.form-input');
+        jsonData.cabinet[index].name = inputs[0].value;
+        jsonData.cabinet[index].type = inputs[1].value;
+        jsonData.cabinet[index].visible = inputs[2].checked;
+    });
 
-    <script>
-        // ================= MQTT НАСТРОЙКИ =================
-        const mqttHost = 'wss://m1.wqtt.ru:19157';
-        const mqttOptions = {
-            connectTimeout: 15000,
-            keepalive: 60,
-            reconnectPeriod: 3000,
-            clientId: 'WebClient_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            username: 'u_LQAPTV',
-            password: 'bC4joft7',
-            protocolVersion: 4,
-            rejectUnauthorized: false
-        };
-
-        let client = null;
-        let outTopic = 'ST8';
-        let isMqttConnected = false;
-
-        // ================= ИНИЦИАЛИЗАЦИЯ =================
-        document.addEventListener('DOMContentLoaded', () => {
-            initMQTT();
-            loadConfig();
-            setupEventListeners();
+    try {
+        const response = await fetch('/saveConfig', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(jsonData)
         });
-
-        function initMQTT() {
-            const statusEl = document.getElementById('mqttStatus');
-            
-            try {
-                client = mqtt.connect(mqttHost, mqttOptions);
-
-                client.on('connect', () => {
-                    isMqttConnected = true;
-                    statusEl.textContent = '● Подключено';
-                    statusEl.className = 'mqtt-status connected';
-                    client.subscribe(outTopic, { qos: 1 });
-                    console.log('✅ MQTT подключён');
-                });
-
-                client.on('error', (err) => {
-                    isMqttConnected = false;
-                    statusEl.textContent = '✕ Ошибка';
-                    statusEl.className = 'mqtt-status';
-                    console.error('❌ MQTT ошибка:', err);
-                });
-
-                client.on('close', () => {
-                    isMqttConnected = false;
-                    statusEl.textContent = '○ Отключено';
-                    statusEl.className = 'mqtt-status';
-                    console.log('🔌 MQTT отключён');
-                });
-
-                client.on('reconnect', () => {
-                    statusEl.textContent = '⟳ Переподключение...';
-                    statusEl.className = 'mqtt-status connecting';
-                });
-
-                client.on('message', (topic, message) => {
-                    const msg = message.toString();
-                    const iframe = document.getElementById('myFrame');
-                    if (iframe?.contentWindow) {
-                        iframe.contentWindow.postMessage(
-                            { type: 'mqttMessage', topic, payload: msg }, 
-                            '*'
-                        );
-                    }
-                });
-
-            } catch (e) {
-                console.error('❌ Не удалось инициализировать MQTT:', e);
-                statusEl.textContent = '✕ Ошибка MQTT';
-                statusEl.className = 'mqtt-status';
-            }
-        }
-
-        function reconnectMQTT() {
-            if (client) {
-                client.end(true, () => {
-                    setTimeout(() => initMQTT(), 1000);
-                });
-            }
-        }
-
-        // ================= НАВИГАЦИЯ =================
-        function loadContent(url, button) {
-            const container = document.getElementById('buttonsContainer');
-            container.querySelectorAll('.cabinet-btn').forEach(btn => btn.classList.remove('active'));
-            if (button) button.classList.add('active');
-
-            const iframe = document.getElementById('myFrame');
-            iframe.src = url;
-        }
-
-        function newLoadContent(name, type) {
-            // Переключаем топик
-            if (client && isMqttConnected) {
-                client.unsubscribe(outTopic);
-                outTopic = "PSU6/" + name;
-                client.subscribe(outTopic, { qos: 1 });
-            }
-
-            // Формируем URL
-            const url = type === "6_zone" ? 'st_6.html' : 'st_36.html';
-            const stNumber = name.replace('ST', '');
-            const fullUrl = `${url}?st=${stNumber}`;
-
-            const iframe = document.getElementById('myFrame');
-            iframe.src = fullUrl;
-        }
-
-        // ================= ДАННЫЕ И ОТРИСОВКА =================
-        let jsonData = null;
-        let displayData = null;
-
-        function loadConfig() {
-            // Заглушка данных — замените на fetch('/getConfig') при необходимости
-            jsonData = {
-                cabinet: [
-                    {name:"ST8", type:"6_zone", visible:true},
-                    {name:"ST9", type:"6_zone", visible:true},
-                    {name:"ST10", type:"36_zone", visible:true},
-                    {name:"ST11", type:"36_zone", visible:true},
-                    {name:"ST12", type:"36_zone", visible:true},
-                    {name:"ST13", type:"6_zone", visible:true}
-                ]
-            };
+        if (response.ok) {
             displayData = JSON.parse(JSON.stringify(jsonData));
             displayCabinetButtons();
+            closeSettingsModal();
+            console.log('Шкафы сохранены!');
+        } else {
+            console.log('Ошибка сохранения!');
         }
+    } catch (error) {
+        console.log('Ошибка связи!');
+    }
+}
 
-        function displayCabinetButtons() {
-            const container = document.getElementById('buttonsContainer');
-            container.innerHTML = '';
+loadConfig();
 
-            displayData.cabinet.forEach(cabinet => {
-                if (!cabinet.visible) return;
+window.onclick = e => { if (e.target.id === 'settingsModal') closeSettingsModal(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSettingsModal(); });
+</script>
 
-                const btn = document.createElement('button');
-                btn.className = `cabinet-btn type-${cabinet.type}`;
-                btn.textContent = cabinet.name;
-                btn.type = 'button';
-                btn.setAttribute('aria-label', `Выбрать шкаф ${cabinet.name}`);
-
-                btn.addEventListener('click', function() {
-                    newLoadContent(cabinet.name, cabinet.type);
-                    container.querySelectorAll('.cabinet-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-
-                container.appendChild(btn);
-            });
-        }
-
-        // ================= МОДАЛЬНОЕ ОКНО =================
-        function openSettingsModal() {
-            if (jsonData) {
-                renderSettingsForm();
-                document.getElementById('settingsModal').style.display = 'block';
-                document.body.style.overflow = 'hidden'; // Блокируем прокрутку фона
-            }
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-
-        function renderSettingsForm() {
-            const container = document.getElementById('cabinetSettings');
-            container.innerHTML = '';
-
-            jsonData.cabinet.forEach((cabinet, index) => {
-                const setting = document.createElement('div');
-                setting.className = 'cabinet-setting';
-                setting.dataset.index = index;
-                setting.innerHTML = `
-                    <div class="setting-name">${escapeHtml(cabinet.name)}</div>
-                    <div class="form-row">
-                        <label for="name-${index}">Name:</label>
-                        <input type="text" id="name-${index}" class="form-input" value="${escapeHtml(cabinet.name)}" maxlength="20">
-                    </div>
-                    <div class="form-row">
-                        <label for="type-${index}">Тип:</label>
-                        <select id="type-${index}" class="form-input">
-                            <option value="6_zone" ${cabinet.type === '6_zone' ? 'selected' : ''}>6 зон</option>
-                            <option value="36_zone" ${cabinet.type === '36_zone' ? 'selected' : ''}>36 зон</option>
-                        </select>
-                    </div>
-                    <div class="show-row">
-                        <input type="checkbox" id="visible-${index}" class="form-input" ${cabinet.visible ? 'checked' : ''}>
-                        <label for="visible-${index}">Показывать</label>
-                    </div>
-                `;
-                container.appendChild(setting);
-            });
-        }
-
-        // ================= СОХРАНЕНИЕ =================
-        async function saveAllChanges() {
-            const settings = document.querySelectorAll('.cabinet-setting');
-            
-            settings.forEach(setting => {
-                const index = parseInt(setting.dataset.index);
-                const nameInput = setting.querySelector(`#name-${index}`);
-                const typeSelect = setting.querySelector(`#type-${index}`);
-                const visibleCheck = setting.querySelector(`#visible-${index}`);
-                
-                if (jsonData.cabinet[index]) {
-                    jsonData.cabinet[index].name = nameInput?.value.trim() || jsonData.cabinet[index].name;
-                    jsonData.cabinet[index].type = typeSelect?.value || jsonData.cabinet[index].type;
-                    jsonData.cabinet[index].visible = visibleCheck?.checked ?? false;
-                }
-            });
-
-            try {
-                const response = await fetch('/saveConfig', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(jsonData),
-                    timeout: 10000
-                });
-
-                if (response.ok) {
-                    displayData = JSON.parse(JSON.stringify(jsonData));
-                    displayCabinetButtons();
-                    closeSettingsModal();
-                    showTemporaryMessage('✅ Настройки сохранены!', 'success');
-                    console.log('💾 Шкафы сохранены в LittleFS');
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-            } catch (error) {
-                console.error('❌ Ошибка сохранения:', error);
-                showTemporaryMessage('❌ Ошибка сохранения!', 'error');
-            }
-        }
-
-        // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
-        function setupEventListeners() {
-            // Закрытие модального окна по клику вне контента
-            document.getElementById('settingsModal').addEventListener('click', (e) => {
-                if (e.target.id === 'settingsModal') closeSettingsModal();
-            });
-
-            // Закрытие по Escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeSettingsModal();
-            });
-
-            // Предотвращение всплытия клика внутри модального окна
-            document.querySelector('.modal-content')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-
-            // Улучшенная поддержка тач-событий для меню
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navContainer = document.querySelector('.nav-container');
-            
-            menuToggle?.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-            }, {passive: true});
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showTemporaryMessage(text, type = 'info') {
-            const msg = document.createElement('div');
-            msg.textContent = text;
-            msg.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 12px 24px;
-                background: ${type === 'success' ? 'var(--success)' : type === 'error' ? '#dc3545' : 'var(--primary)'};
-                color: white;
-                border-radius: 10px;
-                font-weight: 500;
-                font-size: 14px;
-                z-index: 3000;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            `;
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-        }
-
-        // Добавляем CSS-анимации динамически
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideUp {
-                from { opacity: 0; transform: translate(-50%, 20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-            }
-            @keyframes fadeOut {
-                to { opacity: 0; transform: translate(-50%, -10px); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ================= ОБРАБОТКА РАЗМЕРА IFRAME =================
-        function updateIframeHeight() {
-            const iframe = document.getElementById('myFrame');
-            const headerHeight = 140; // Приблизительная высота шапки
-            const footerPadding = 40;
-            const availableHeight = window.innerHeight - headerHeight - footerPadding;
-            
-            iframe.style.height = Math.max(400, Math.min(availableHeight, 1300)) + 'px';
-        }
-
-        window.addEventListener('resize', updateIframeHeight);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(updateIframeHeight, 300);
-        });
-
-        // Инициализация высоты при загрузке
-        setTimeout(updateIframeHeight, 100);
-    </script>
 </body>
 </html>
-
