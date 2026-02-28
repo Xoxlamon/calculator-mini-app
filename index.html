@@ -166,6 +166,107 @@
             position: absolute;
             pointer-events: none;
         }
+
+        /* Стили для модального окна */
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-modal.active {
+            display: flex;
+        }
+
+        .info-content {
+            background: #1c1c1e;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            color: white;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ff9f0a;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: #060c1b;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .info-item:hover {
+            background: #1a2440;
+        }
+
+        .info-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #ff9f0a;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .info-text strong {
+            display: block;
+            color: #ff9f0a;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+
+        .info-text p {
+            margin: 0;
+            color: #a5a5a5;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -187,6 +288,52 @@
             <button class="header-button" onclick="window.location.href='Kalls.html'">3</button>
             <button class="header-button" onclick="window.location.href='PT100.html'">4</button>
             <button class="header-button" onclick="window.location.href='ohm-law-calculator.html'">5</button>
+            <button class="header-button" onclick="showInfoMenu()" style="background: #ff9f0a;">?</button>
+        </div>
+    </div>
+    
+    <!-- Модальное окно с информацией -->
+    <div class="info-modal" id="infoModal" onclick="closeInfoMenu(event)">
+        <div class="info-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeInfoMenu()">&times;</button>
+            <h2>Описание кнопок</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <button class="info-button" onclick="showCalculator(); closeInfoMenu()">1</button>
+                    <div class="info-text">
+                        <strong>Карьера</strong>
+                        <p>Расчёт карьерных показателей и достижений</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <button class="info-button" onclick="window.location.href='virus/Kall_Energia.html'; closeInfoMenu()">2</button>
+                    <div class="info-text">
+                        <strong>Ремонт</strong>
+                        <p>Калькулятор расчёта стоимости ремонта</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <button class="info-button" onclick="window.location.href='Kalls.html'; closeInfoMenu()">3</button>
+                    <div class="info-text">
+                        <strong>Болот</strong>
+                        <p>Расчёты для болотистой местности</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <button class="info-button" onclick="window.location.href='PT100.html'; closeInfoMenu()">4</button>
+                    <div class="info-text">
+                        <strong>Рубильник</strong>
+                        <p>Управление рубильником и расчёт нагрузки</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <button class="info-button" onclick="window.location.href='ohm-law-calculator.html'; closeInfoMenu()">5</button>
+                    <div class="info-text">
+                        <strong>Кимоно</strong>
+                        <p>Расчёт параметров для кимоно</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -295,6 +442,17 @@
         function showCalculator() {
             // Здесь можно добавить логику, если нужно
             console.log("Нажата кнопка домой/1");
+        }
+
+        // Функции для модального окна с информацией
+        function showInfoMenu() {
+            document.getElementById('infoModal').classList.add('active');
+        }
+
+        function closeInfoMenu(event) {
+            if (!event || event.target.id === 'infoModal' || event.target.classList.contains('close-btn')) {
+                document.getElementById('infoModal').classList.remove('active');
+            }
         }
      </script>
 </body>
