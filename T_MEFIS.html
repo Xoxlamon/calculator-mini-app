@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -20,6 +19,33 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+        }
+
+        /* Кнопка "Назад" - фиксирована в левом верхнем углу */
+        .back-button {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: #082667;
+            border: none;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-button:hover {
+            background: #0a3080;
+            transform: translateY(-1px);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
         }
 
         .calculator {
@@ -29,6 +55,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            margin-top: 20px; /* Отступ для кнопки на мобильных */
         }
 
         .header {
@@ -180,6 +207,7 @@
         @media (max-width: 480px) {
             .calculator {
                 padding: 20px;
+                margin-top: 50px; /* Больший отступ на мобильных */
             }
             
             .header h1 {
@@ -194,26 +222,20 @@
                 padding: 10px;
                 font-size: 13px;
             }
-        }
-           .header-button {
-    background: #082667;
-    border: none;
-    color: #fff;
-    padding: 6px 18px;
-    border-radius: 16px;
-    font-size: 12px;
-    cursor: pointer;
-}
-        .back-button:hover {
-            background-color: var(--button-hover-clear);
+            
+            .back-button {
+                top: 12px;
+                left: 12px;
+                padding: 6px 16px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-      <!-- кнопка назад -->
-   <div class="header">
-        <button class="header-button" onclick="window.location.href='index.html'">Назад</button>
-    </div>
+    <!-- Кнопка назад - вынесена из .calculator, фиксирована -->
+    <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
+
     <div class="calculator">
         <div class="header">
             <h1>Калькулятор тока МЭФИС</h1>
