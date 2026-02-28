@@ -180,9 +180,29 @@
         #theme-toggle:hover {
             opacity: 0.8;
         }
+
+        /* small fixed back button in top-left */
+        .back-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 4px 6px;
+            font-size: 14px;
+            background-color: var(--button-clear);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+        .back-button:hover {
+            background-color: var(--button-hover-clear);
+        }
     </style>
 </head>
 <body>
+    <!-- кнопка назад -->
+    <button class="back-button" onclick="goBack()">← Назад</button>
     <!-- КНОПКА ТЕМЫ — ДОЛЖНА БЫТЬ ЗДЕСЬ, НА УРОВНЕ BODY -->
     <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
 
@@ -313,6 +333,10 @@
                 console.error('Ошибка при копировании: ', err);
                 alert("Не удалось скопировать. Попробуйте вручную.");
             });
+        }
+
+        function goBack() {
+            history.back();
         }
     </script>
 </body>
