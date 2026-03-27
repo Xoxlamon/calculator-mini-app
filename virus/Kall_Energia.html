@@ -1,488 +1,772 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Калькулятор электроэнергии</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ЭлектроКальк | Расчёт электроэнергии</title>
     <style>
-        /* Базовые сбросы и настройки */
-        *, *::before, *::after {
+        * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            overflow-x: hidden;
-            max-width: 100vw;
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f7e6ff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            line-height: 1.5;
-        }
-
-        /* === Кнопка "Назад" === */
-        .header {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 8px;
-            display: flex;
-            justify-content: flex-start;
-            padding: 0 4px;
-        }
-
-        .header-button {
-            background: #082667;
-            border: none;
-            color: #fff;
-            padding: 6px 18px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .header-button:hover {
-            opacity: 0.8;
-        }
-
-        .header-button:focus-visible {
-            outline: 3px solid #8b5cf6;
-            outline-offset: 2px;
-        }
-
-        /* Карточка калькулятора */
-        .calculator {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            margin: 12px auto;
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-
-        .calculator:active {
-            transform: scale(0.998);
-        }
-
-        .calculator h1 {
-            color: #8b5cf6;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        /* Поля ввода */
-        .calculator label {
-            display: block;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #64748b;
-            text-align: left;
-            padding-left: 4px;
-            font-weight: 500;
-        }
-
-        .calculator input {
-            width: 100%;
-            padding: 14px 16px;
-            margin: 4px 0 8px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background-color: #f8fafc;
-            -moz-appearance: textfield;
-        }
-
-        .calculator input::-webkit-outer-spin-button,
-        .calculator input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f1eef9;
             margin: 0;
+            padding: 24px 16px;
         }
 
-        .calculator input:focus {
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            padding: 24px 22px;
+            flex: 1;
+            min-width: 320px;
+            transition: all 0.2s;
+            border: 1px solid #e9e2f5;
+        }
+
+        .card h2 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: #2d2b3f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 5px solid #8b5cf6;
+            padding-left: 16px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #4b3f72;
+            margin: 1.2rem 0 0.8rem 0;
+        }
+
+        .label-group {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4a4a6a;
+            margin-top: 14px;
+            margin-bottom: 4px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border: 1.5px solid #e2ddf0;
+            border-radius: 20px;
+            background: #fefefe;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
             outline: none;
             border-color: #8b5cf6;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
-            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
 
-        .calculator input::placeholder {
-            color: #94a3b8;
+        .tariff-toggle {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0 12px 0;
         }
 
-        /* Кнопки */
-        .calculator button {
-            background-color: #6366f1;
-            color: white;
-            padding: 14px 24px;
+        .toggle-btn {
+            flex: 1;
+            background: #f0edfa;
             border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 40px;
             font-weight: 500;
-            margin: 8px 4px;
-            min-height: 48px;
-            min-width: 48px;
-            width: calc(50% - 8px);
-            transition: background-color 0.2s, transform 0.1s;
-            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            color: #4a3f7c;
+            transition: 0.2s;
+            font-size: 0.9rem;
         }
 
-        .calculator button:active {
+        .toggle-btn.active {
+            background: #8b5cf6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+        }
+
+        .double-inputs {
+            background: #faf8ff;
+            padding: 12px 12px 8px 12px;
+            border-radius: 24px;
+            margin-top: 10px;
+        }
+
+        .double-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .double-row div {
+            flex: 1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #6d3ee5;
             transform: scale(0.98);
         }
 
-        .calculator button:hover {
-            background-color: #4f46e5;
+        .btn-secondary {
+            background: #e9e2ff;
+            color: #4f46e5;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        .calculator button:focus-visible {
-            outline: 3px solid #8b5cf6;
-            outline-offset: 2px;
+        .btn-secondary:hover {
+            background: #ddd2fc;
         }
 
-        .clear-button {
-            background-color: #ef4444;
+        .btn-danger {
+            background: #fee2e2;
+            color: #c2410c;
         }
 
-        .clear-button:hover {
-            background-color: #dc2626;
+        .btn-danger:hover {
+            background: #ffd6d6;
         }
 
-        /* Результат */
-        .result {
-            margin-top: 24px;
-            font-size: 18px;
-            color: #16a34a;
-            font-weight: 600;
-            padding: 16px;
-            background-color: #f0fdf4;
-            border-radius: 12px;
-            border: 1px solid #bbf7d0;
-            min-height: 24px;
-            white-space: pre-line;
-            word-wrap: break-word;
+        .result-box {
+            background: #f7f3ff;
+            border-radius: 24px;
+            padding: 18px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            border-left: 4px solid #8b5cf6;
+            word-break: break-word;
         }
 
-        .result.error {
+        .error {
+            border-left-color: #f97316;
+            background: #fff4ed;
+            color: #b45309;
+        }
+
+        .periods-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .period-box {
+            background: white;
+            flex: 1;
+            text-align: center;
+            padding: 12px 5px;
+            border-radius: 20px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e9dfff;
+        }
+
+        .period-box span {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #8b5cf6;
+            margin-top: 6px;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fefcff;
+            padding: 12px 14px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            border: 1px solid #ede6ff;
+        }
+
+        .device-item button {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #a855f7;
+            font-weight: bold;
+            padding: 0 8px;
+        }
+
+        .device-item button:hover {
             color: #dc2626;
-            background-color: #fef2f2;
-            border-color: #fecaca;
         }
 
-        /* Разделитель между калькуляторами */
-        .divider {
-            width: 100%;
-            max-width: 400px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #cbd5e1, transparent);
-            margin: 8px auto;
+        .device-list {
+            margin: 15px 0;
+            max-height: 280px;
+            overflow-y: auto;
         }
 
-        /* === МЕДИА-ЗАПРОСЫ === */
-        
-        /* Планшеты и большие телефоны */
-        @media (min-width: 768px) {
-            body {
-                flex-direction: row;
-                justify-content: center;
-                align-items: flex-start;
-                padding: 24px;
-                gap: 20px;
-            }
-            
-            .calculator {
-                margin: 0;
-            }
-            
-            .divider {
-                display: none;
-            }
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
-        /* Маленькие телефоны */
-        @media (max-width: 360px) {
-            body {
-                padding: 12px;
-            }
-            
-            .calculator {
-                padding: 16px;
-                border-radius: 14px;
-            }
-            
-            .calculator h1 {
-                font-size: 1.3rem;
-            }
-            
-            .calculator input,
-            .calculator button {
-                padding: 12px 14px;
-                font-size: 16px;
-            }
-            
-            .result {
-                font-size: 16px;
-                padding: 14px;
-            }
+        hr {
+            margin: 20px 0;
+            border-color: #ede6ff;
         }
 
-        /* Тёмная тема (авто-определение) */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1e1b4b;
-            }
-            
-            .calculator {
-                background-color: #2d2a4a;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            }
-            
-            .calculator h1 {
-                color: #a78bfa;
-            }
-            
-            .calculator label {
-                color: #cbd5e1;
-            }
-            
-            .calculator input {
-                background-color: #373355;
-                border-color: #4b5563;
-                color: #f1f5f9;
-            }
-            
-            .calculator input:focus {
-                background-color: #3f3b60;
-            }
-            
-            .calculator input::placeholder {
-                color: #64748b;
-            }
-            
-            .result {
-                background-color: #166534;
-                border-color: #15803d;
-                color: #86efac;
-            }
-            
-            .result.error {
-                background-color: #991b1b;
-                border-color: #b91c1c;
-                color: #fecaca;
-            }
+        .small-note {
+            font-size: 0.7rem;
+            color: #8f8bb3;
+            margin-top: 6px;
         }
 
-        /* Анимация появления */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .calculator {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .calculator:first-of-type {
-            animation-delay: 0s;
-        }
-        
-        .calculator:last-of-type {
-            animation-delay: 0.1s;
+        @media (max-width: 900px) {
+            .container { flex-direction: column; }
+            .card { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- Кнопка назад -->
-    <div class="header">
-        <button class="header-button" onclick="window.location.href='../index.html'" aria-label="Вернуться на главную страницу">← Назад</button>
-    </div>
-
-    <!-- Калькулятор 1: по показаниям -->
-    <div class="calculator">
-        <h1>🔌 По показаниям</h1>
-        
-        <label for="previousReading">Предыдущие показания:</label>
-        <input type="number" id="previousReading" placeholder="Например: 1250" inputmode="decimal" required>
-        
-        <label for="currentReading">Текущие показания:</label>
-        <input type="number" id="currentReading" placeholder="Например: 1380" inputmode="decimal" required>
-        
-        <label for="tariff1">Тариф за кВт⋅ч:</label>
-        <input type="number" id="tariff1" placeholder="1.80" value="1.80" step="0.01" inputmode="decimal" aria-describedby="tariffHint1">
-        <small id="tariffHint1" style="display:block; color:#94a3b8; font-size:12px; margin:-4px 0 8px 4px; text-align:left;">₽ за киловатт-час</small>
-        
-        <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
-            <button type="button" onclick="calculateElectricity1()" aria-label="Рассчитать стоимость по показаниям счётчика">💡 Рассчитать</button>
-            <button type="button" class="clear-button" onclick="clearFields1()" aria-label="Очистить поля калькулятора">🗑️ Стереть</button>
+<div class="container">
+    <!-- КАРТОЧКА 1: ПО ПОКАЗАНИЯМ СЧЁТЧИКА -->
+    <div class="card">
+        <h2>📟 По показаниям</h2>
+        <div class="tariff-toggle">
+            <button id="singleBtn1" class="toggle-btn active">⚡ Однотарифный</button>
+            <button id="doubleBtn1" class="toggle-btn">🌙☀️ Двухтарифный</button>
         </div>
-        
-        <div class="result" id="result1" role="status" aria-live="polite"></div>
-    </div>
 
-    <div class="divider"></div>
-
-    <!-- Калькулятор 2: по кВт⋅ч -->
-    <div class="calculator">
-        <h1>⚡ По кВт⋅ч</h1>
-        
-        <label for="consumption">Количество кВт⋅ч:</label>
-        <input type="number" id="consumption" placeholder="Например: 130" inputmode="decimal" required>
-        
-        <label for="tariff2">Тариф за кВт⋅ч:</label>
-        <input type="number" id="tariff2" placeholder="1.80" value="1.80" step="0.01" inputmode="decimal" aria-describedby="tariffHint2">
-        <small id="tariffHint2" style="display:block; color:#94a3b8; font-size:12px; margin:-4px 0 8px 4px; text-align:left;">₽ за киловатт-час</small>
-        
-        <div style="display: flex; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
-            <button type="button" onclick="calculateElectricity2()" aria-label="Рассчитать стоимость по количеству кВт⋅ч">💡 Рассчитать</button>
-            <button type="button" class="clear-button" onclick="clearFields2()" aria-label="Очистить поля калькулятора">🗑️ Стереть</button>
+        <div id="singleTariffInputs1">
+            <div class="label-group">💰 Тариф (₽/кВт·ч)</div>
+            <input type="number" id="tariffSingle1" step="0.01" value="1.8" placeholder="Напр. 1.8">
         </div>
-        
-        <div class="result" id="result2" role="status" aria-live="polite"></div>
+
+        <div id="doubleTariffInputs1" style="display: none;">
+            <div class="double-inputs">
+                <div class="double-row">
+                    <div>
+                        <div class="label-group">🌞 Дневной тариф (₽/кВт·ч)</div>
+                        <input type="number" id="tariffDay1" step="0.01" value="1.92" placeholder="день">
+                    </div>
+                    <div>
+                        <div class="label-group">🌙 Ночной тариф (₽/кВт·ч)</div>
+                        <input type="number" id="tariffNight1" step="0.01" value="1.15" placeholder="ночь">
+                    </div>
+                </div>
+                <div class="small-note">*Расход распределяется: день 70% / ночь 30% (примерное соотношение)</div>
+            </div>
+        </div>
+
+        <div class="label-group">📊 Предыдущие показания (кВт·ч)</div>
+        <input type="number" id="previousReading" step="1" placeholder="Например 11200">
+
+        <div class="label-group">📈 Текущие показания (кВт·ч)</div>
+        <input type="number" id="currentReading" step="1" placeholder="Например 11580">
+
+        <div class="button-group">
+            <button class="btn-primary" id="calcMeterBtn">🧮 Рассчитать</button>
+            <button class="btn-secondary btn-danger" id="clearMeterBtn">🗑 Очистить</button>
+        </div>
+        <div id="result1" class="result-box" style="display: none;"></div>
+        <button id="exportMeterPdf" class="btn-secondary" style="margin-top: 6px; width: 100%;">📄 Экспорт в PDF</button>
     </div>
 
-    <script>
-        // Вспомогательная функция для показа результата
-        function showResult(elementId, message, isError = false) {
-            const el = document.getElementById(elementId);
-            el.textContent = message;
-            el.className = 'result' + (isError ? ' error' : '');
+    <!-- КАРТОЧКА 2: ПО КИЛОВАТТ-ЧАСАМ -->
+    <div class="card">
+        <h2>⚡ По кВт·ч</h2>
+        <div class="label-group">🔋 Расход (кВт·ч)</div>
+        <input type="number" id="consumption" step="any" placeholder="Сколько кВт·ч израсходовано">
+
+        <div class="label-group">💰 Тариф (₽/кВт·ч)</div>
+        <input type="number" id="tariff2" step="0.01" value="1.8" placeholder="Тариф">
+
+        <div class="button-group">
+            <button class="btn-primary" id="calcKwhBtn">🧮 Рассчитать</button>
+            <button class="btn-secondary btn-danger" id="clearKwhBtn">🗑 Очистить</button>
+        </div>
+        <div id="result2" class="result-box" style="display: none;"></div>
+        <button id="exportKwhPdf" class="btn-secondary" style="margin-top: 6px; width: 100%;">📄 Экспорт в PDF</button>
+    </div>
+
+    <!-- КАРТОЧКА 3: БЫТОВЫЕ ПРИБОРЫ -->
+    <div class="card">
+        <h2>🔌 Приборы (расход в месяц)</h2>
+        <div class="label-group">📱 Тип прибора</div>
+        <select id="deviceSelect">
+            <option value="60">💡 Лампа LED (60 Вт)</option>
+            <option value="100">💡 Лампа накаливания (100 Вт)</option>
+            <option value="300">🖥 Компьютер (300 Вт)</option>
+            <option value="2000">⚡ Электрочайник (2000 Вт)</option>
+            <option value="800">📺 Телевизор (80 Вт)</option>
+            <option value="1500">🌀 Обогреватель (1500 Вт)</option>
+            <option value="custom">✨ Свой прибор (ввести мощность)</option>
+        </select>
+
+        <div id="customPowerDiv" style="display: none; margin-top: 12px;">
+            <div class="label-group">🔌 Мощность прибора (Вт)</div>
+            <input type="number" id="customPower" step="1" placeholder="Например 1200">
+        </div>
+
+        <div class="label-group">⏱ Часов работы в день</div>
+        <input type="number" id="deviceHours" step="0.5" value="2" placeholder="часы/день">
+
+        <button class="btn-primary" id="addDeviceBtn" style="margin: 16px 0 10px;">➕ Добавить прибор</button>
+
+        <h3>📋 Список приборов</h3>
+        <div id="deviceList" class="device-list">
+            <p style="color:#aaa; text-align:center;">Список пуст</p>
+        </div>
+        <div id="deviceTotal" style="display: none;">
+            <div class="result-box" style="background:#e9e2ff; margin-top: 10px;">
+                <strong>📊 Суммарный расход:</strong> <span id="totalKwh">0</span> кВт·ч в месяц
+            </div>
+        </div>
+
+        <div class="label-group">💰 Тариф для приборов (₽/кВт·ч)</div>
+        <input type="number" id="tariffDevices" step="0.01" value="1.58">
+
+        <div id="result3" class="result-box" style="display: none;"></div>
+        <button id="exportDevicesPdf" class="btn-secondary" style="margin-top: 10px; width: 100%;">📄 Экспорт PDF (приборы)</button>
+    </div>
+</div>
+
+<script>
+    // ------------------- ГЛОБАЛЬНЫЕ ДАННЫЕ -------------------
+    let currentTariffMode = 'single';   // 'single' или 'double' для первой карточки
+    let devices = [];
+
+    // Загрузка из localStorage
+    function loadStoredData() {
+        const savedTariff = localStorage.getItem('electricityTariff');
+        const savedDevices = localStorage.getItem('electricityDevices');
+        const savedMode = localStorage.getItem('meterTariffMode');
+        
+        if (savedTariff) {
+            document.getElementById('tariffSingle1').value = savedTariff;
+            document.getElementById('tariff2').value = savedTariff;
+            document.getElementById('tariffDevices').value = savedTariff;
         }
-
-        // Вспомогательная функция для плавной прокрутки
-        function scrollToResult(elementId) {
-            setTimeout(() => {
-                const el = document.getElementById(elementId);
-                el.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'nearest' 
-                });
-            }, 150);
+        if (savedMode === 'double') {
+            currentTariffMode = 'double';
+            document.getElementById('singleBtn1').classList.remove('active');
+            document.getElementById('doubleBtn1').classList.add('active');
+            document.getElementById('singleTariffInputs1').style.display = 'none';
+            document.getElementById('doubleTariffInputs1').style.display = 'block';
+        } else {
+            currentTariffMode = 'single';
+            document.getElementById('singleBtn1').classList.add('active');
+            document.getElementById('doubleBtn1').classList.remove('active');
+            document.getElementById('singleTariffInputs1').style.display = 'block';
+            document.getElementById('doubleTariffInputs1').style.display = 'none';
         }
+        if (savedDevices) {
+            try {
+                devices = JSON.parse(savedDevices);
+                renderDevices();
+            } catch(e) { devices = []; }
+        }
+    }
 
-        // Калькулятор 1: по показаниям
-        function calculateElectricity1() {
-            const previousInput = document.getElementById('previousReading');
-            const currentInput = document.getElementById('currentReading');
-            const tariffInput = document.getElementById('tariff1');
-            
-            const previous = parseFloat(previousInput.value);
-            const current = parseFloat(currentInput.value);
-            const tariff = parseFloat(tariffInput.value) || 1.58;
+    // Сохранить тариф в localStorage
+    function saveTariffToStorage(tariff) {
+        if (tariff && !isNaN(tariff)) localStorage.setItem('electricityTariff', tariff);
+    }
+    function saveModeToStorage(mode) {
+        localStorage.setItem('meterTariffMode', mode);
+    }
 
-            // Валидация
-            if (!previousInput.value || !currentInput.value) {
-                showResult('result1', '⚠️ Заполните оба поля показаний', true);
-                scrollToResult('result1');
+    // Рендер списка приборов
+    function renderDevices() {
+        const listContainer = document.getElementById('deviceList');
+        const totalDiv = document.getElementById('deviceTotal');
+        const totalKwhSpan = document.getElementById('totalKwh');
+        
+        if (!devices.length) {
+            listContainer.innerHTML = '<p style="color:#9ca3af; text-align:center;">✨ Список пуст. Добавьте прибор</p>';
+            totalDiv.style.display = 'none';
+            document.getElementById('result3').style.display = 'none';
+            return;
+        }
+        
+        let totalMonthKwh = 0;
+        listContainer.innerHTML = devices.map(dev => {
+            const monthlyKwh = (dev.power * dev.hours * 30) / 1000;
+            totalMonthKwh += monthlyKwh;
+            return `
+                <div class="device-item">
+                    <span><strong>${escapeHtml(dev.name)}</strong> (${dev.power} Вт, ${dev.hours} ч/д)</span>
+                    <div style="display:flex; gap: 8px; align-items:center;">
+                        <span style="font-weight:500;">${monthlyKwh.toFixed(1)} кВт·ч</span>
+                        <button onclick="removeDeviceById(${dev.id})" style="background:#f3e8ff; border-radius:30px; width:30px; height:30px;">✕</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        totalDiv.style.display = 'block';
+        totalKwhSpan.innerText = totalMonthKwh.toFixed(1);
+        
+        // расчёт стоимости по тарифу приборов
+        const tariff = parseFloat(document.getElementById('tariffDevices').value);
+        if (!isNaN(tariff) && tariff > 0) {
+            const costMonth = totalMonthKwh * tariff;
+            const costDay = costMonth / 30;
+            const costYear = costMonth * 12;
+            const resultDiv = document.getElementById('result3');
+            showResult(resultDiv, `
+                <strong>💰 Стоимость электроприборов:</strong>
+                <div class="periods-grid">
+                    <div class="period-box">День <span>${costDay.toFixed(2)} ₽</span></div>
+                    <div class="period-box">Месяц <span>${costMonth.toFixed(2)} ₽</span></div>
+                    <div class="period-box">Год <span>${costYear.toFixed(2)} ₽</span></div>
+                </div>
+            `, false);
+            resultDiv.style.display = 'block';
+        } else {
+            document.getElementById('result3').style.display = 'none';
+        }
+    }
+    
+    function removeDeviceById(id) {
+        devices = devices.filter(d => d.id !== id);
+        localStorage.setItem('electricityDevices', JSON.stringify(devices));
+        renderDevices();
+    }
+    
+    function addDeviceFromForm() {
+        const select = document.getElementById('deviceSelect');
+        let power = 0;
+        let name = "";
+        const hours = parseFloat(document.getElementById('deviceHours').value);
+        
+        if (select.value === 'custom') {
+            power = parseFloat(document.getElementById('customPower').value);
+            name = "Свой прибор";
+            if (isNaN(power) || power <= 0) {
+                alert("Укажите корректную мощность (Вт) для своего прибора");
                 return;
             }
-
-            if (isNaN(previous) || isNaN(current) || isNaN(tariff)) {
-                showResult('result1', '❌ Введите корректные числа', true);
-                scrollToResult('result1');
-                return;
-            }
-
-            if (current < previous) {
-                showResult('result1', '❌ Текущие показания не могут быть меньше предыдущих!', true);
-                scrollToResult('result1');
-                return;
-            }
-
-            const consumption = current - previous;
-            const cost = consumption * tariff;
-            
-            showResult('result1', `📊 Расход: ${consumption.toFixed(2)} кВт⋅ч\n💰 Стоимость: ${cost.toFixed(2)} ₽`);
-            scrollToResult('result1');
-            
-            // Вибрация при успехе (если поддерживается)
-            if ('vibrate' in navigator) navigator.vibrate(50);
+        } else {
+            power = parseFloat(select.value);
+            name = select.options[select.selectedIndex].text.split('(')[0].trim();
+            if (isNaN(power) || power <= 0) power = 0;
         }
-
-        // Очистка полей для калькулятора 1
-        function clearFields1() {
-            document.getElementById('previousReading').value = '';
-            document.getElementById('currentReading').value = '';
-            document.getElementById('tariff1').value = '1.58';
-            document.getElementById('result1').textContent = '';
-            document.getElementById('result1').className = 'result';
-            document.getElementById('previousReading').focus();
+        
+        if (isNaN(hours) || hours <= 0) {
+            alert("Введите часы работы в день (больше 0)");
+            return;
         }
-
-        // Калькулятор 2: по кВт⋅ч
-        function calculateElectricity2() {
-            const consumptionInput = document.getElementById('consumption');
-            const tariffInput = document.getElementById('tariff2');
-            
-            const consumption = parseFloat(consumptionInput.value);
-            const tariff = parseFloat(tariffInput.value) || 1.58;
-
-            if (!consumptionInput.value) {
-                showResult('result2', '⚠️ Введите количество кВт⋅ч', true);
-                scrollToResult('result2');
-                return;
-            }
-
-            if (isNaN(consumption) || isNaN(tariff)) {
-                showResult('result2', '❌ Введите корректные числа', true);
-                scrollToResult('result2');
-                return;
-            }
-
-            if (consumption <= 0) {
-                showResult('result2', '❌ Значение должно быть больше 0', true);
-                scrollToResult('result2');
-                return;
-            }
-
-            const cost = consumption * tariff;
-            showResult('result2', `💰 Стоимость: ${cost.toFixed(2)} ₽`);
-            scrollToResult('result2');
-            
-            if ('vibrate' in navigator) navigator.vibrate(50);
+        
+        if (power <= 0) {
+            alert("Мощность должна быть больше 0 Вт");
+            return;
         }
-
-        // Очистка полей для калькулятора 2
-        function clearFields2() {
-            document.getElementById('consumption').value = '';
-            document.getElementById('tariff2').value = '1.58';
-            document.getElementById('result2').textContent = '';
-            document.getElementById('result2').className = 'result';
-            document.getElementById('consumption').focus();
-        }
-
-        // Обработка нажатия Enter в полях ввода
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const calcId = this.closest('.calculator').querySelector('.result').id;
-                    if (calcId === 'result1') calculateElectricity1();
-                    else calculateElectricity2();
-                }
-            });
+        
+        devices.push({
+            id: Date.now(),
+            name: name,
+            power: power,
+            hours: hours
         });
-
-        // Мягкая обработка touch-событий (не ломает скролл)
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
-    </script>
+        localStorage.setItem('electricityDevices', JSON.stringify(devices));
+        renderDevices();
+        document.getElementById('deviceHours').value = "2";
+        if (select.value === 'custom') document.getElementById('customPower').value = "";
+    }
+    
+    // Универсальный показ результата
+    function showResult(element, html, isError = false) {
+        element.innerHTML = html;
+        element.style.display = 'block';
+        if (isError) {
+            element.classList.add('error');
+        } else {
+            element.classList.remove('error');
+        }
+    }
+    
+    // РАСЧЁТ ПО ПОКАЗАНИЯМ (карточка 1)
+    function calculateByMeter() {
+        const previous = parseFloat(document.getElementById('previousReading').value);
+        const current = parseFloat(document.getElementById('currentReading').value);
+        const resultDiv = document.getElementById('result1');
+        
+        if (isNaN(previous) || isNaN(current)) {
+            showResult(resultDiv, "❌ Заполните предыдущие и текущие показания", true);
+            return;
+        }
+        if (current < previous) {
+            showResult(resultDiv, "⚠️ Текущие показания не могут быть меньше предыдущих", true);
+            return;
+        }
+        
+        const consumption = current - previous;
+        let totalCost = 0;
+        let detailText = "";
+        let tariffUsed = 0;
+        
+        if (currentTariffMode === 'single') {
+            const tariff = parseFloat(document.getElementById('tariffSingle1').value);
+            if (isNaN(tariff) || tariff <= 0) {
+                showResult(resultDiv, "Укажите корректный однотарифный тариф", true);
+                return;
+            }
+            totalCost = consumption * tariff;
+            tariffUsed = tariff;
+            detailText = `💰 Тариф: ${tariff.toFixed(2)} ₽/кВт·ч<br>`;
+            saveTariffToStorage(tariff);
+        } else {
+            const dayTariff = parseFloat(document.getElementById('tariffDay1').value);
+            const nightTariff = parseFloat(document.getElementById('tariffNight1').value);
+            if (isNaN(dayTariff) || isNaN(nightTariff) || dayTariff <= 0 || nightTariff <= 0) {
+                showResult(resultDiv, "Введите дневной и ночной тарифы", true);
+                return;
+            }
+            // условное распределение 70% день, 30% ночь (можно сделать более умное, но для демо)
+            const dayShare = 0.7;
+            const nightShare = 0.3;
+            const dayKwh = consumption * dayShare;
+            const nightKwh = consumption * nightShare;
+            totalCost = dayKwh * dayTariff + nightKwh * nightTariff;
+            detailText = `🌞 День: ${dayKwh.toFixed(1)} кВт·ч × ${dayTariff.toFixed(2)}₽<br>🌙 Ночь: ${nightKwh.toFixed(1)} кВт·ч × ${nightTariff.toFixed(2)}₽<br>`;
+            tariffUsed = (dayTariff + nightTariff)/2;
+            localStorage.setItem('electricityTariff', dayTariff);
+        }
+        
+        const costDay = totalCost / 30;
+        const costMonth = totalCost;
+        const costYear = totalCost * 12;
+        
+        const html = `
+            <strong>📊 Расход:</strong> ${consumption.toFixed(2)} кВт·ч<br>
+            ${detailText}
+            <strong>💸 Итого:</strong> ${totalCost.toFixed(2)} ₽
+            <div class="periods-grid">
+                <div class="period-box">💵 День <span>${costDay.toFixed(2)} ₽</span></div>
+                <div class="period-box">📆 Месяц <span>${costMonth.toFixed(2)} ₽</span></div>
+                <div class="period-box">📅 Год <span>${costYear.toFixed(2)} ₽</span></div>
+            </div>
+        `;
+        showResult(resultDiv, html, false);
+    }
+    
+    // РАСЧЁТ ПО КВТ·Ч (карточка 2)
+    function calculateByKwh() {
+        const consumption = parseFloat(document.getElementById('consumption').value);
+        const tariff = parseFloat(document.getElementById('tariff2').value);
+        const resultDiv = document.getElementById('result2');
+        
+        if (isNaN(consumption) || consumption <= 0) {
+            showResult(resultDiv, "Введите расход (кВт·ч) больше нуля", true);
+            return;
+        }
+        if (isNaN(tariff) || tariff <= 0) {
+            showResult(resultDiv, "Укажите корректный тариф", true);
+            return;
+        }
+        
+        const totalCost = consumption * tariff;
+        const costDay = totalCost / 30;
+        const costMonth = totalCost;
+        const costYear = totalCost * 12;
+        localStorage.setItem('electricityTariff', tariff);
+        
+        const html = `
+            <strong>💰 Стоимость ${consumption.toFixed(2)} кВт·ч:</strong> ${totalCost.toFixed(2)} ₽<br>
+            <div class="periods-grid">
+                <div class="period-box">День <span>${costDay.toFixed(2)} ₽</span></div>
+                <div class="period-box">Месяц <span>${costMonth.toFixed(2)} ₽</span></div>
+                <div class="period-box">Год <span>${costYear.toFixed(2)} ₽</span></div>
+            </div>
+        `;
+        showResult(resultDiv, html, false);
+    }
+    
+    // Функция для экспорта PDF (печать любого блока)
+    function exportToPDF(elementId, title = "Отчёт по электроэнергии") {
+        const sourceDiv = document.getElementById(elementId);
+        if (!sourceDiv || sourceDiv.style.display === 'none' || sourceDiv.innerText.trim() === "") {
+            alert("Нет данных для экспорта. Сначала выполните расчёт.");
+            return;
+        }
+        const contentClone = sourceDiv.cloneNode(true);
+        // Убираем лишние кнопки если вдруг внутри есть
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"><title>${title}</title>
+            <style>
+                body { font-family: 'Segoe UI', sans-serif; padding: 30px; line-height: 1.5; }
+                h1 { color: #4f46e5; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px; }
+                .periods-grid { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+                .period-box { background: #f3f0fc; padding: 12px 18px; border-radius: 16px; text-align: center; min-width: 100px; }
+                .period-box span { font-size: 1.5rem; font-weight: bold; color: #6d28d9; display: block; }
+                .device-item { border-bottom: 1px solid #ddd; padding: 8px 0; display: flex; justify-content: space-between; }
+                .result-box { margin: 15px 0; }
+                button, .btn-primary, .btn-secondary { display: none; }
+            </style>
+            </head>
+            <body>
+            <h1>${title}</h1>
+            <p>Дата: ${new Date().toLocaleString()}</p>
+            <div>${contentClone.innerHTML}</div>
+            <script>
+                setTimeout(() => { window.print(); setTimeout(() => window.close(), 500); }, 400);
+            <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+    
+    // Очистка полей первой карточки
+    function clearMeter() {
+        document.getElementById('previousReading').value = '';
+        document.getElementById('currentReading').value = '';
+        document.getElementById('result1').style.display = 'none';
+        document.getElementById('tariffSingle1').value = localStorage.getItem('electricityTariff') || '1.58';
+        if (currentTariffMode === 'double') {
+            if (!document.getElementById('tariffDay1').value) document.getElementById('tariffDay1').value = '1.92';
+            if (!document.getElementById('tariffNight1').value) document.getElementById('tariffNight1').value = '1.15';
+        }
+    }
+    
+    function clearKwh() {
+        document.getElementById('consumption').value = '';
+        document.getElementById('result2').style.display = 'none';
+        document.getElementById('tariff2').value = localStorage.getItem('electricityTariff') || '1.58';
+    }
+    
+    // Переключение тарифа в карточке 1
+    function setupTariffToggles() {
+        const singleBtn = document.getElementById('singleBtn1');
+        const doubleBtn = document.getElementById('doubleBtn1');
+        const singleDiv = document.getElementById('singleTariffInputs1');
+        const doubleDiv = document.getElementById('doubleTariffInputs1');
+        
+        singleBtn.addEventListener('click', () => {
+            currentTariffMode = 'single';
+            singleBtn.classList.add('active');
+            doubleBtn.classList.remove('active');
+            singleDiv.style.display = 'block';
+            doubleDiv.style.display = 'none';
+            saveModeToStorage('single');
+        });
+        doubleBtn.addEventListener('click', () => {
+            currentTariffMode = 'double';
+            doubleBtn.classList.add('active');
+            singleBtn.classList.remove('active');
+            singleDiv.style.display = 'none';
+            doubleDiv.style.display = 'block';
+            saveModeToStorage('double');
+        });
+    }
+    
+    // Подписка на изменение тарифа приборов для пересчета
+    function bindDeviceTariffUpdate() {
+        const tariffDevInput = document.getElementById('tariffDevices');
+        tariffDevInput.addEventListener('input', () => {
+            if (devices.length) renderDevices();
+        });
+    }
+    
+    // Показать/скрыть поле своей мощности
+    document.getElementById('deviceSelect').addEventListener('change', function() {
+        const customDiv = document.getElementById('customPowerDiv');
+        customDiv.style.display = this.value === 'custom' ? 'block' : 'none';
+    });
+    
+    // Эскейп для HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Инициализация событий
+    function init() {
+        loadStoredData();
+        setupTariffToggles();
+        bindDeviceTariffUpdate();
+        
+        document.getElementById('calcMeterBtn').addEventListener('click', calculateByMeter);
+        document.getElementById('clearMeterBtn').addEventListener('click', clearMeter);
+        document.getElementById('calcKwhBtn').addEventListener('click', calculateByKwh);
+        document.getElementById('clearKwhBtn').addEventListener('click', clearKwh);
+        document.getElementById('addDeviceBtn').addEventListener('click', addDeviceFromForm);
+        document.getElementById('exportMeterPdf').addEventListener('click', () => exportToPDF('result1', 'Отчёт по показаниям счётчика'));
+        document.getElementById('exportKwhPdf').addEventListener('click', () => exportToPDF('result2', 'Отчёт по расходам кВт·ч'));
+        document.getElementById('exportDevicesPdf').addEventListener('click', () => {
+            const content = document.getElementById('deviceList').innerHTML + (document.getElementById('result3').innerHTML ? document.getElementById('result3').innerHTML : '');
+            if (!devices.length && !document.getElementById('result3').innerHTML) {
+                alert("Нет данных о приборах для экспорта");
+                return;
+            }
+            exportToPDF('deviceList', 'Список приборов и стоимость');
+        });
+        
+        // При изменении тарифа в первой карточке сохраняем в общий storage для удобства
+        document.getElementById('tariffSingle1').addEventListener('change', function() {
+            localStorage.setItem('electricityTariff', this.value);
+        });
+        document.getElementById('tariff2').addEventListener('change', function() {
+            localStorage.setItem('electricityTariff', this.value);
+        });
+        
+        // при изменении тарифов дня/ночи можно сохранять отдельно, но не обязательно
+    }
+    
+    window.removeDeviceById = removeDeviceById;
+    window.onload = init;
+</script>
 </body>
 </html>
