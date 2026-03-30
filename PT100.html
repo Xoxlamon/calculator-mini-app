@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -52,7 +53,6 @@
             color: var(--text-primary);
         }
 
-        /* контейнер */
         .app-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -61,7 +61,6 @@
             gap: 1.5rem;
         }
 
-        /* верхняя панель */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -115,14 +114,12 @@
             transform: translateY(1px);
         }
 
-        /* основная сетка */
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             gap: 1.8rem;
         }
 
-        /* карточка ввода */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(2px);
@@ -227,7 +224,6 @@
             border-color: var(--accent);
         }
 
-        /* история в виде карточек */
         .history-header {
             display: flex;
             justify-content: space-between;
@@ -302,7 +298,6 @@
             border-radius: 1.5rem;
         }
 
-        /* скроллбар */
         .history-grid::-webkit-scrollbar {
             width: 5px;
         }
@@ -313,6 +308,31 @@
         .history-grid::-webkit-scrollbar-thumb {
             background: var(--accent);
             border-radius: 10px;
+        }
+
+        /* всплывающий тост для фидбека */
+        .toast-message {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: var(--accent);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+        }
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
         }
 
         @keyframes fadeSlideUp {
@@ -326,7 +346,6 @@
             }
         }
 
-        /* адаптив */
         @media (max-width: 850px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -338,9 +357,13 @@
             .temp-value {
                 font-size: 2rem;
             }
+            .toast-message {
+                white-space: nowrap;
+                font-size: 0.8rem;
+                bottom: 1.2rem;
+            }
         }
 
-        /* кнопка темы (в стиле новой визуализации) */
         .theme-toggle-btn {
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(4px);
@@ -376,7 +399,6 @@
     </div>
 
     <div class="dashboard">
-        <!-- Левая панель: ввод -->
         <div class="card">
             <div class="input-group">
                 <label>📋 Номер SK (необязательно, только цифры)</label>
@@ -401,7 +423,6 @@
             </div>
         </div>
 
-        <!-- Правая панель: история в современном стиле -->
         <div class="card">
             <div class="history-header">
                 <h3>📆 Журнал измерений</h3>
@@ -416,7 +437,7 @@
 
 <script>
     // ======================== ДАННЫЕ ========================
-    let measurements = [];  // { sk, resistance, temperature }
+    let measurements = [];  
     let isDark = false;
 
     // DOM элементы
@@ -430,7 +451,22 @@
     const historyCountSpan = document.getElementById('historyCount');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-    // Функция расчёта температуры по сопротивлению (Pt100 линейная)
+    // Утилита для показа всплывающего тоста (мобильный дружественный)
+    function showToast(message, duration = 2000) {
+        let toast = document.querySelector('.toast-message');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-message';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+    }
+
+    // Расчёт температуры по сопротивлению Pt100 (линейная аппроксимация)
     function calcTemp(resistance) {
         return (resistance - 100) / 0.385;
     }
@@ -461,13 +497,12 @@
         `;
     }
 
-    // Добавление измерения в историю
+    // Добавление измерения
     function addMeasurement() {
         let skRaw = skInput.value.trim();
         const resistanceRaw = resistanceInput.value.trim();
 
-        // SK необязателен: если введён, проверяем цифры
-        let skDisplay = "—";  // значение по умолчанию, если SK не введён
+        let skDisplay = "—";
         if (skRaw !== "") {
             if (!/^\d+$/.test(skRaw)) {
                 alert("Номер SK может содержать только цифры (если заполнен). Оставьте поле пустым, чтобы записать без имени.");
@@ -490,7 +525,6 @@
         const roundedTemp = temperature.toFixed(2);
         const roundedRes = resistance.toFixed(2);
 
-        // Добавляем в начало (чтобы новые записи были сверху)
         measurements.unshift({
             sk: skDisplay,
             resistance: roundedRes,
@@ -499,21 +533,19 @@
             timestamp: Date.now()
         });
 
-        // Сохраняем в localStorage
         saveToLocalStorage();
         renderHistory();
 
-        // Очищаем поля, фокус на SK
         skInput.value = '';
         resistanceInput.value = '';
         skInput.focus();
 
-        // анимация успеха (короткая)
         calcAddBtn.style.transform = 'scale(0.97)';
         setTimeout(() => { calcAddBtn.style.transform = ''; }, 150);
+        showToast(`➕ Добавлено: ${roundedRes} Ω → ${roundedTemp} °C`, 1800);
     }
 
-    // Рендер истории в виде карточек
+    // Отрисовка истории
     function renderHistory() {
         if (!historyContainer) return;
         if (measurements.length === 0) {
@@ -524,14 +556,13 @@
         historyCountSpan.innerText = measurements.length;
         let html = '';
         measurements.forEach((item, idx) => {
-            // иконка температуры
             let tempIcon = '🌡️';
             if (item.rawTemp > 200) tempIcon = '🔥';
             else if (item.rawTemp < -30) tempIcon = '❄️';
             html += `
                 <div class="history-card" data-idx="${idx}">
                     <div class="history-info">
-                        <div class="history-sk">${item.sk}</div>
+                        <div class="history-sk">${escapeHtml(item.sk)}</div>
                         <div class="history-resistance">${item.resistance} Ω</div>
                     </div>
                     <div class="history-temp">
@@ -543,21 +574,49 @@
         historyContainer.innerHTML = html;
     }
 
-    // Очистка всей истории
+    // простая защита от XSS
+    function escapeHtml(str) {
+        if (!str) return str;
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Очистка всей истории — исправлено для мобильных устройств:
+    // 1. Принудительно убираем фокус с любого активного поля (скрываем клавиатуру)
+    // 2. Добавляем визуальный фидбек через тост
+    // 3. Надёжный confirm, который гарантированно показывается поверх всего
     function clearAllHistory() {
-        if (measurements.length === 0) return;
-        if (confirm('Удалить все записи из журнала?')) {
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ:
+        // Снимаем фокус с любого активного элемента (особенно с input), 
+        // чтобы клавиатура скрылась и модальное окно confirm появлялось корректно.
+        if (document.activeElement && document.activeElement.blur) {
+            document.activeElement.blur();
+        }
+        
+        if (measurements.length === 0) {
+            showToast("📭 История уже пуста", 1500);
+            return;
+        }
+        
+        // Используем стандартный confirm — после blur он надёжно работает на всех мобильных браузерах
+        const isConfirmed = confirm("⚠️ Удалить все записи из журнала?");
+        if (isConfirmed) {
             measurements = [];
             saveToLocalStorage();
             renderHistory();
-            livePreviewDiv.innerHTML = `
-                <div style="font-size:0.8rem; opacity:0.7;">мгновенный расчёт</div>
-                <div class="temp-value">--<span class="temp-unit"> °C</span></div>
-            `;
+            showToast("✅ История полностью очищена", 1800);
+            // Дополнительно: сбросим превью (для эстетики)
+            updateLivePreview();
+        } else {
+            showToast("Отмена", 1000);
         }
     }
 
-    // Копирование данных (таблица с разделителями)
+    // Копирование истории в буфер (таблица)
     async function copyHistoryToClipboard() {
         if (measurements.length === 0) {
             alert("Нет данных для копирования");
@@ -569,18 +628,18 @@
         });
         try {
             await navigator.clipboard.writeText(text);
-            // визуальный фидбек
             const originalText = copyHistoryBtn.innerText;
             copyHistoryBtn.innerText = '✅ Скопировано!';
             setTimeout(() => {
                 copyHistoryBtn.innerText = originalText;
             }, 1500);
+            showToast("📋 История скопирована", 1500);
         } catch (err) {
             alert("Не удалось скопировать, попробуйте вручную");
         }
     }
 
-    // Сохранение / загрузка из localStorage
+    // localStorage
     function saveToLocalStorage() {
         localStorage.setItem('pt100_measurements', JSON.stringify(measurements));
     }
@@ -590,7 +649,6 @@
         if (saved) {
             try {
                 measurements = JSON.parse(saved);
-                // восстановим rawTemp для иконок (если нет, пересчитаем)
                 measurements = measurements.map(m => {
                     if (m.rawTemp === undefined && m.resistance) {
                         const r = parseFloat(m.resistance);
@@ -600,14 +658,18 @@
                     return m;
                 });
                 renderHistory();
-            } catch(e) { console.warn(e); measurements = []; }
+            } catch(e) { 
+                console.warn(e); 
+                measurements = []; 
+                renderHistory();
+            }
         } else {
             measurements = [];
             renderHistory();
         }
     }
 
-    // Тёмная тема: полная смена CSS класса на body и стилизация кнопки
+    // Тёмная тема
     function initTheme() {
         const storedTheme = localStorage.getItem('pt100_theme');
         if (storedTheme === 'dark') {
@@ -632,9 +694,9 @@
             themeToggleBtn.innerHTML = '☀️';
         }
         isDark = !isDark;
+        showToast(isDark ? "🌙 Тёмная тема" : "☀️ Светлая тема", 1000);
     }
 
-    // Обработка Enter
     function handleEnter(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -642,25 +704,46 @@
         }
     }
 
-    // Инициализация событий
-    function bindEvents() {
+    // Дополнительная защита для мобильных: обработчики touch + click (но без дублей)
+    function attachButtonEvents() {
+        // Используем click — на мобильных он полностью корректен после снятия фокуса
         calcAddBtn.addEventListener('click', addMeasurement);
         clearAllBtn.addEventListener('click', clearAllHistory);
         copyHistoryBtn.addEventListener('click', copyHistoryToClipboard);
+        
+        // Для особой надёжности добавим обработку touchstart с preventDefault? 
+        // Не требуется, т.к. основная проблема была в фокусе клавиатуры.
+        // Но добавим небольшую защиту от случайного двойного срабатывания — не нужно.
+    }
+
+    function bindEvents() {
+        attachButtonEvents();
         resistanceInput.addEventListener('input', updateLivePreview);
         skInput.addEventListener('keypress', handleEnter);
         resistanceInput.addEventListener('keypress', handleEnter);
         themeToggleBtn.addEventListener('click', toggleTheme);
     }
 
-    // Старт
+    // Инициализация
     function init() {
         initTheme();
         loadFromLocalStorage();
         bindEvents();
         updateLivePreview();
-        // дополнительно добавим автофокус
-        skInput.focus();
+        // Убираем автофокус для улучшения UX на мобильных (чтобы не открывать клавиатуру сразу)
+        // Но оставим лёгкий фокус только если поле пустое и нет истории? 
+        // На мобильных лучше не фокусироваться автоматически, но пользователь сам сможет кликнуть.
+        // Чтобы избежать случайного открытия клавы — не вызываем focus() агрессивно.
+        // Однако для удобства на десктопе можно, но на мобильных пусть пользователь сам тыкает.
+        // Просто убираем автоматический фокус, чтобы клавиатура не мешала обзору.
+        if (window.innerWidth < 768) {
+            // На мобильных не фокусируемся автоматически, чтобы клавиатура не перекрывала интерфейс
+            skInput.blur();
+            resistanceInput.blur();
+        } else {
+            // На десктопе можно дать фокус на SK для удобства
+            skInput.focus();
+        }
     }
 
     init();
